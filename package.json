@@ -1,0 +1,33 @@
+{
+	"name": "spoon-fed",
+	"private": true,
+	"type": "module",
+	"author": "Callum Gare <callum@gare.au>",
+	"repository": "https://github.com/callumgare/spoon-fed",
+	"scripts": {
+		"build": "nuxt build",
+		"dev": "nuxt dev",
+		"generate": "nuxt generate",
+		"preview": "nuxt preview",
+		"start": "node ./server/index.mjs",
+		"postinstall": "nuxt prepare"
+	},
+	"dependencies": {
+		"@keyv/redis": "^4.2.0",
+		"@primevue/forms": "^4.2.5",
+		"@primevue/themes": "^4.2.5",
+		"@vueuse/core": "^12.4.0",
+		"keyv": "^5.2.3",
+		"keyv-file": "^5.1.1",
+		"nuxt": "^3.15.1",
+		"primevue": "^4.2.5",
+		"vue": "latest",
+		"vue-router": "latest",
+		"zod": "^3.24.1"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "1.9.4",
+		"@primevue/nuxt-module": "^4.2.5",
+		"primeicons": "^7.0.0"
+	}
+}
