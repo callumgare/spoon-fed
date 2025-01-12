@@ -19,7 +19,9 @@ export class Cache {
 	private getKeyv = async () => {
 		if (!this.keyv) {
 			// We import dynamically so that Cache can be used in the browser
-			const cacheUrl = (process.env.CACHE_URL || process.env.CACHE_KV_URL)?.trim();
+			const cacheUrl = (
+				process.env.CACHE_URL || process.env.CACHE_KV_URL
+			)?.trim();
 			if (!cacheUrl) {
 				throw Error("CACHE_URL not set");
 			}
@@ -30,7 +32,10 @@ export class Cache {
 					filename: cacheUrl,
 					writeDelay: 100,
 				});
-			} else if (cacheUrl.startsWith("redis://")) {
+			} else if (
+				cacheUrl.startsWith("redis://") ||
+				cacheUrl.startsWith("rediss://")
+			) {
 				const { default: KeyvRedis } = await import("@keyv/redis");
 				store = new KeyvRedis(cacheUrl);
 			} else {
