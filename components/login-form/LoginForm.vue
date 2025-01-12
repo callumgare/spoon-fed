@@ -70,7 +70,7 @@ const resolver = zodResolver(formSchema);
 				:formControl="{ validateOnValueUpdate: $form.password?.invalid }"
 			/>
 		</div>
-		<Button type="submit" severity="secondary" label="Login" :disabled="isSubmitting" />
+		<Button type="submit" label="Login" :disabled="isSubmitting" size="large" />
 		<div class="submissionFeedback">
 			<ProgressSpinner v-if="isSubmitting" />
 			<Message v-else-if="generalFormError" severity="error" size="large" variant="simple">{{ generalFormError.message }}</Message>

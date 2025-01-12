@@ -20,8 +20,8 @@ const id = useId();
 		<label :for="id" class="sr-only">{{ label }}</label>
 		<IconField>
 			<InputIcon :class="['pi', iconClass]" />
-			<Password v-if="type === 'password'" :name="name" :placeholder="label" toggleMask :id="id" :disabled="disabled" :feedback="false" :form-control="formControl" />
-			<InputText v-else :name="name" :type="type" :placeholder="label" :id="id" :disabled="disabled" :form-control="formControl" />
+			<Password v-if="type === 'password'" :name="name" :placeholder="label" toggleMask :id="id" :disabled="disabled" :feedback="false" :form-control="formControl" size="large" />
+			<InputText v-else :name="name" :type="type" :placeholder="label" :id="id" :disabled="disabled" :form-control="formControl" size="large" />
 		</IconField>
 		<Message v-if="state?.invalid" severity="error" size="small" variant="simple">{{ state.error?.message }}</Message>
 	</div>
