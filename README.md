@@ -44,7 +44,7 @@ npm run start
 ```
 
 ## Credits
-The image used for recipes with no image or a broken image is the [Knife and Fork Twitter Emoji icon](https://iconscout.com/free-icon/fork-and-knife-cooking-kitchen-emoj-symbol).
+Logo based on the spoon and frame doodle drawings from [Khushmeen Sidhu's Doodle icons set](https://khushmeen.com/icons.html). The placeholder image used for recipes without an image or that have a broken image is the [Knife and Fork Twitter Emoji icon](https://iconscout.com/free-icon/fork-and-knife-cooking-kitchen-emoj-symbol).
 
 ## Future plans
 - Maybe provide an option to use without Paprika by allowing users to sign-up for local accounts and save their recipes directly in Spoon Fed, emulating the Paprika API to use the recipes.
