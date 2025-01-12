@@ -19,7 +19,7 @@ export class Cache {
 	private getKeyv = async () => {
 		if (!this.keyv) {
 			// We import dynamically so that Cache can be used in the browser
-			const cacheUrl = process.env.CACHE_URL?.trim();
+			const cacheUrl = (process.env.CACHE_URL || process.env.CACHE_KV_URL)?.trim();
 			if (!cacheUrl) {
 				throw Error("CACHE_URL not set");
 			}

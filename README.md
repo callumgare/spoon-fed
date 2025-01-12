@@ -16,7 +16,7 @@ npm install
 Then setup the following required environment variables. If running locally then the file `.env.example` can be copied to `.env`.
 
 ## Environment Variables
-  - **CACHE_URL**\
+  - **CACHE_URL** (or **CACHE_KV_URL**)\
     To reduce load on Papika's servers, API requests are cached. CACHE_URL configures where they're cached. It can either be a local file path (e.g. `/tmp/spoon-fed/cache.json`) or a Redis connection string (e.g. `redis://user:pass@localhost:6379`).
 
 ## Development Server
