@@ -50,7 +50,7 @@ const resolver = zodResolver(formSchema);
 </script>
 
 <template>
-	<Form v-slot="$form" :initialValues="initialValues" :resolver @submit="submitHandler">
+	<Form v-slot="$form" :initialValues="initialValues" :resolver @submit="submitHandler" :validate-on-value-update="false" :validate-on-submit="true">
 		<div class="fields">
 			<LoginFormField
 				name="email"
@@ -58,6 +58,7 @@ const resolver = zodResolver(formSchema);
 				label="Email Address"
 				:state="$form.email"
 				:disabled="isSubmitting"
+				:formControl="{ validateOnValueUpdate: $form.email?.invalid }"
 			/>
 			<LoginFormField
 				name="password"
@@ -66,6 +67,7 @@ const resolver = zodResolver(formSchema);
 				type="password"
 				:state="$form.password"
 				:disabled="isSubmitting"
+				:formControl="{ validateOnValueUpdate: $form.password?.invalid }"
 			/>
 		</div>
 		<Button type="submit" severity="secondary" label="Login" :disabled="isSubmitting" />
