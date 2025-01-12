@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useLocalStorage } from "@vueuse/core";
 
-const { recipes, status, total } = useRecipes();
+const { recipes, recipesWithLoading, status, total } = useRecipes();
 const settings = useSettings();
 
 const selectedRecipeIds = useLocalStorage<Record<string, boolean>>(
@@ -42,7 +42,7 @@ function handleLogout() {
 		</nav>
 		<TabPanels>
 			<TabPanel value="recipes">
-				<RecipesSelector :recipes="recipes || []" v-model="selectedRecipeIds" />
+				<RecipesSelector :recipes="recipesWithLoading || []" v-model="selectedRecipeIds" />
 			</TabPanel>
 			<TabPanel value="ingredients">
 				<IngredientsList :ingredients="ingredientsForSelected" />

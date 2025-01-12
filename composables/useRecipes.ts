@@ -35,6 +35,12 @@ export const useRecipes = () => {
 	});
 
 	const recipes = ref<Recipe[]>([]);
+	const recipesWithLoading = computed((): (Recipe | null)[] => [
+		...recipes.value,
+		...new Array(total.value ? total.value - recipes.value.length : 0).fill(
+			null,
+		),
+	]);
 	watch(recipesIndex.data, async () => {
 		if (recipesIndex.data.value) {
 			try {
@@ -67,6 +73,7 @@ export const useRecipes = () => {
 
 	return {
 		recipes,
+		recipesWithLoading,
 		status,
 		error,
 		total,

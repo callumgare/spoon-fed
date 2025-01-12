@@ -2,16 +2,25 @@
 import type { Recipe } from "~/lib/paprika/types";
 
 const props = defineProps<{
-	recipe: Recipe;
+	recipe: Recipe | null;
 }>();
 
 const model = defineModel<boolean>();
 const imageSrcFallback = "/images/fork.svg";
-const imageSrc = ref(props.recipe.image_url || imageSrcFallback);
+const imageSrc = ref(props.recipe?.image_url || imageSrcFallback);
+watch(
+	() => props.recipe?.image_url,
+	() => {
+		if (props.recipe?.image_url) {
+			imageSrc.value = props.recipe.image_url;
+		}
+	},
+);
 </script>
 
 <template>
   <Card
+    v-if="recipe"
     @click="model = !model"
     :class="{selected: model}"
   >
@@ -20,22 +29,34 @@ const imageSrc = ref(props.recipe.image_url || imageSrcFallback);
         alt=""
         :src="imageSrc"
         :class="{fallback: imageSrc === imageSrcFallback}"
-        style="width: 100%"
         @error="imageSrc = imageSrcFallback"
       />
     </template>
-    <template #title>{{recipe.name}}</template>
-    <template #content v-if="recipe.description">
+    <template #title>
+      {{recipe.name}}
+    </template>
+    <template #content v-if="recipe?.description">
       <p class="m-0">
         {{ recipe.description }}
       </p>
+    </template>
+  </Card>
+  <Card v-else>
+    <template #header>
+      <Skeleton height="150px"></Skeleton>
+    </template>
+    <template #title>
+      <Skeleton height="1.5rem"></Skeleton>
+    </template>
+    <template #content>
+      <Skeleton></Skeleton>
     </template>
   </Card>
 </template>
 
 <style scoped>
 .p-card {
-  width: 15rem;
+  width: min(15rem, 40vw);
   overflow: hidden;
 
   &.selected {
@@ -49,12 +70,17 @@ const imageSrc = ref(props.recipe.image_url || imageSrcFallback);
     }
   }
 
-  img {
+  img, .p-skeleton {
     width: 100%;
 
     &.fallback {
       padding: 2em;
     }
+  }
+  .p-skeleton {
+    height: 5rem;
+  }
+  .p-card-header {
   }
 }
 </style>

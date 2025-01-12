@@ -3,16 +3,16 @@ import type { Recipe } from "~/lib/paprika/types";
 import RecipeCard from "./RecipeCard.vue";
 
 const props = defineProps<{
-	recipes: Recipe[];
+	recipes: (Recipe | null)[];
 }>();
 
-const model = defineModel<Record<string, boolean>>({ default: {} });
+const selectedRecipes = defineModel<Record<string, boolean>>({ default: {} });
 </script>
 
 <template>
   <ul>
     <li v-for="recipe in recipes">
-      <RecipeCard :recipe="recipe" v-model="model[recipe.uid]" />
+      <RecipeCard :recipe="recipe" v-model="selectedRecipes[recipe?.uid || '']" />
     </li>
   </ul>
 </template>
