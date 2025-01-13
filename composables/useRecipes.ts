@@ -1,10 +1,11 @@
+import { createGlobalState } from "@vueuse/core";
 import { Cache } from "~/lib/cache/client";
 import type { Recipe, RecipeIndexItem } from "~/lib/paprika/types";
 import { RateLimiter } from "~/lib/utils/flow";
 import type { AsyncDataRequestStatus } from "#app";
 
-export const useRecipes = () => {
-	const settings = useSettings();
+export const useRecipes = createGlobalState(() => {
+	const settings = useSettingsStore();
 
 	const cache = new Cache();
 
@@ -78,4 +79,4 @@ export const useRecipes = () => {
 		error,
 		total,
 	};
-};
+});

@@ -15,6 +15,9 @@ export default defineNuxtConfig({
 			pathPrefix: false,
 		},
 	],
+	imports: {
+		dirs: ["stores"],
+	},
 	primevue: {
 		options: {
 			theme: {

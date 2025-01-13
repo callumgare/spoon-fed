@@ -5,7 +5,8 @@ const props = defineProps<{
 	recipe: Recipe | null;
 }>();
 
-const model = defineModel<boolean>();
+const recipeId = computed(() => props.recipe?.uid || "");
+const selectionQty = useRecipeSelectionQty(recipeId);
 const imageSrcFallback = "/images/fork.svg";
 const imageSrc = ref(props.recipe?.image_url || imageSrcFallback);
 watch(
@@ -21,8 +22,8 @@ watch(
 <template>
   <Card
     v-if="recipe"
-    @click="model = !model"
-    :class="{selected: model}"
+    @click="selectionQty = selectionQty ? 0 : 1"
+    :class="{selected: selectionQty}"
   >
     <template #header>
       <img

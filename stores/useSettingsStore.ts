@@ -5,7 +5,7 @@ export type Settings = {
 	email: string;
 };
 
-export const useSettings = createGlobalState(() =>
+export const useSettingsStore = createGlobalState(() =>
 	useLocalStorage<Settings>(
 		"settings",
 		{ auth: "", email: "" },

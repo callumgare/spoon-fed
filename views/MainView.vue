@@ -1,22 +1,7 @@
 <script setup lang="ts">
-import { useLocalStorage } from "@vueuse/core";
-
 const { recipes, recipesWithLoading, status, total } = useRecipes();
-const settings = useSettings();
+const settings = useSettingsStore();
 
-const selectedRecipeIds = useLocalStorage<Record<string, boolean>>(
-	"selectedRecipeIds",
-	{},
-);
-
-const selectedRecipes = computed(
-	() =>
-		recipes.value?.filter((recipe) => selectedRecipeIds.value[recipe.uid]) ||
-		[],
-);
-const ingredientsForSelected = computed(() =>
-	selectedRecipes.value.flatMap((recipe) => recipe.ingredients.split("\n")),
-);
 function handleLogout() {
 	settings.value.auth = "";
 	settings.value.email = "";
@@ -34,7 +19,7 @@ function handleLogout() {
 		<nav>
 			<TabList>
 				<Tab value="recipes">Recipes</Tab>
-				<Tab value="ingredients">Ingredients</Tab>
+				<Tab value="shoppingList">Shopping List</Tab>
 			</TabList>
 			<div class="options">
 				<Button label="Logout" icon="pi pi-sign-out" severity="secondary" @click="handleLogout"/>
@@ -42,10 +27,10 @@ function handleLogout() {
 		</nav>
 		<TabPanels>
 			<TabPanel value="recipes">
-				<RecipesSelector :recipes="recipesWithLoading || []" v-model="selectedRecipeIds" />
+				<RecipesSelector :recipes="recipesWithLoading" />
 			</TabPanel>
-			<TabPanel value="ingredients">
-				<IngredientsList :ingredients="ingredientsForSelected" />
+			<TabPanel value="shoppingList">
+				<ShoppingList />
 			</TabPanel>
 		</TabPanels>
 	</Tabs>

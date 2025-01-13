@@ -5,7 +5,7 @@ import { z } from "zod";
 import { Paprika } from "~/lib/paprika/client";
 import { loginDetailsAreValid } from "~/lib/utils/valiation";
 
-const settings = useSettings();
+const settings = useSettingsStore();
 
 const formSchema = z.object({
 	email: z.string().email(),

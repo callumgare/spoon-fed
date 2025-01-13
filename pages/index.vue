@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { useSettings } from "~/composables/useSettings";
-const settings = useSettings();
+const settings = useSettingsStore();
 </script>
 
 <template>

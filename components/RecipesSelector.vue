@@ -5,14 +5,12 @@ import RecipeCard from "./RecipeCard.vue";
 const props = defineProps<{
 	recipes: (Recipe | null)[];
 }>();
-
-const selectedRecipes = defineModel<Record<string, boolean>>({ default: {} });
 </script>
 
 <template>
   <ul>
     <li v-for="recipe in recipes">
-      <RecipeCard :recipe="recipe" v-model="selectedRecipes[recipe?.uid || '']" />
+      <RecipeCard :recipe="recipe" />
     </li>
   </ul>
 </template>
