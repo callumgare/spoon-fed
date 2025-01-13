@@ -5,8 +5,8 @@ const props = defineProps<{
 </script>
 
 <template>
-  <div :class="['ShoppingListItem', {selected: item.checked}]" @click="item.toggleChecked">
-    <Checkbox binary size="large" :modelValue="item.checked"  @update:modelValue="item.toggleChecked" @click.stop="" />
+  <div :class="['ShoppingListItem', {selected: item.checked.value}]" @click="item.toggleChecked">
+    <Checkbox binary size="large" :v-model="item.checked" @click.stop="" />
     <ul>
       <li v-for="ingredient of item.ingredients">
         <span class="prefix">{{ ingredient.description.prefix }}</span>

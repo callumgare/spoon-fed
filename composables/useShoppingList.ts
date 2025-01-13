@@ -1,10 +1,11 @@
-import { createGlobalState } from "@vueuse/core";
+import { createGlobalState, useLocalStorage } from "@vueuse/core";
 import { parse } from "recipe-ingredient-parser-v3";
 import type { Recipe } from "~/lib/paprika/types";
 
 export type ShoppingListItem = {
 	key: string;
-	checked: boolean;
+	checkedSortKey: ComputedRef<number>;
+	checked: WritableComputedRef<boolean, boolean>;
 	ingredients: Array<{
 		description: {
 			full: string;
@@ -16,11 +17,13 @@ export type ShoppingListItem = {
 		recipe: Recipe;
 	}>;
 	toggleChecked: () => void;
-	setChecked: (checked: boolean) => void;
 };
 
 export const useShoppingList = createGlobalState(() => {
-	const shoppingListStore = useShoppingListStore();
+	const shoppingListItemsCheckedState = useLocalStorage<Record<string, number>>(
+		"shoppingListItemsCheckedState",
+		{},
+	);
 	const { recipes } = useRecipes();
 	const recipesSelectionQty = useRecipesSelectionQtyStore();
 
@@ -40,17 +43,36 @@ export const useShoppingList = createGlobalState(() => {
 				const parsedIngredient = parse(ingredient, "eng");
 				const shoppingListItemKey = parsedIngredient.ingredient;
 				let shoppingListItem = shoppingListItemsMap[shoppingListItemKey];
+				const checked = computed({
+					get() {
+						return Boolean(
+							shoppingListItemsCheckedState.value[shoppingListItemKey] &&
+								shoppingListItemsCheckedState.value[shoppingListItemKey] !==
+									Number.MAX_SAFE_INTEGER,
+						);
+					},
+					set(newValue) {
+						if (newValue) {
+							shoppingListItemsCheckedState.value[shoppingListItemKey] =
+								Date.now();
+						} else {
+							shoppingListItemsCheckedState.value[shoppingListItemKey] =
+								Number.MAX_SAFE_INTEGER;
+						}
+					},
+				});
 				if (!shoppingListItem) {
 					shoppingListItem = {
 						key: shoppingListItemKey,
-						checked: shoppingListStore.value[shoppingListItemKey],
+						checkedSortKey: computed(
+							() =>
+								shoppingListItemsCheckedState.value[shoppingListItemKey] ??
+								Number.MAX_SAFE_INTEGER,
+						),
+						checked,
 						ingredients: [],
 						toggleChecked: () => {
-							shoppingListStore.value[shoppingListItemKey] =
-								!shoppingListStore.value[shoppingListItemKey];
-						},
-						setChecked: (checked: boolean) => {
-							shoppingListStore.value[shoppingListItemKey] = checked;
+							checked.value = !checked.value;
 						},
 					};
 					shoppingListItemsMap[shoppingListItemKey] = shoppingListItem;
@@ -94,13 +116,13 @@ export const useShoppingList = createGlobalState(() => {
 
 	// Delete shoppingListItem checked state when it no longer appears on the shopping list due to the recipe(s) which it's ingredient(s) come from are unselected
 	watch(shoppingListItems, () => {
-		for (const shoppingListItemKey in shoppingListStore) {
+		for (const shoppingListItemKey in shoppingListItemsCheckedState) {
 			if (
 				!shoppingListItems.value.some(
 					(item) => item.key === shoppingListItemKey,
 				)
 			) {
-				delete shoppingListStore.value[shoppingListItemKey];
+				delete shoppingListItemsCheckedState.value[shoppingListItemKey];
 			}
 		}
 	});
