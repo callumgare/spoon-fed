@@ -24,7 +24,7 @@ export const useShoppingList = createGlobalState(() => {
 		"shoppingListItemsCheckedState",
 		{},
 	);
-	const { recipes } = useRecipes();
+	const { recipes, status } = useRecipes();
 	const recipesSelectionQty = useRecipesSelectionQtyStore();
 
 	watch(recipesSelectionQty, () => {
@@ -116,13 +116,15 @@ export const useShoppingList = createGlobalState(() => {
 
 	// Delete shoppingListItem checked state when it no longer appears on the shopping list due to the recipe(s) which it's ingredient(s) come from are unselected
 	watch(shoppingListItems, () => {
-		for (const shoppingListItemKey in shoppingListItemsCheckedState) {
-			if (
-				!shoppingListItems.value.some(
-					(item) => item.key === shoppingListItemKey,
-				)
-			) {
-				delete shoppingListItemsCheckedState.value[shoppingListItemKey];
+		if (status.value === "success") {
+			for (const shoppingListItemKey in shoppingListItemsCheckedState.value) {
+				if (
+					!shoppingListItems.value.some(
+						(item) => item.key === shoppingListItemKey,
+					)
+				) {
+					delete shoppingListItemsCheckedState.value[shoppingListItemKey];
+				}
 			}
 		}
 	});
