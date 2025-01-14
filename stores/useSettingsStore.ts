@@ -9,6 +9,6 @@ export const useSettingsStore = createGlobalState(() =>
 	useLocalStorage<Settings>(
 		"settings",
 		{ auth: "", email: "" },
-		{ mergeDefaults: true },
+		{ mergeDefaults: true, initOnMounted: true },
 	),
 );

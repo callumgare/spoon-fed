@@ -8,18 +8,4 @@ const settings = useSettingsStore();
 </template>
 
 <style scoped>
-.tabs {
-	.p-tablist {
-		position: sticky;
-  	top: 0;
-	}
-
-	@media (max-width: 500px) {
-		.p-tablist {
-			order: 2;
-			top: initial;
-			bottom: 0;
-		}
-	}
-}
 </style>

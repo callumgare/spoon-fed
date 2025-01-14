@@ -33,6 +33,7 @@ const submitHandler = async (event: FormSubmitEvent) => {
 				message: "Email and/or password is wrong",
 			};
 		}
+		await navigateTo("/");
 	} catch (error) {
 		generalFormError.value = {
 			message: "An unknown error occurred. Sorry about that :(",
@@ -82,7 +83,7 @@ const resolver = zodResolver(formSchema);
 .p-form {
 	display: flex;
 	flex-direction: column;
-	gap: 1rem;
+	gap: 1.5rem;
 	align-items: center;
 	width: min(100%, 45rem);
 
