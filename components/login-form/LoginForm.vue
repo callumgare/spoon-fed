@@ -56,7 +56,7 @@ const resolver = zodResolver(formSchema);
 			<LoginFormField
 				name="email"
 				icon-class="pi-at" 
-				label="Email Address"
+				label="Paprika Account Email Address"
 				:state="$form.email"
 				:disabled="isSubmitting"
 				:formControl="{ validateOnValueUpdate: $form.email?.invalid }"
@@ -64,13 +64,14 @@ const resolver = zodResolver(formSchema);
 			<LoginFormField
 				name="password"
 				icon-class="pi-key" 
-				label="Password"
+				label="Paprika Account Password"
 				type="password"
 				:state="$form.password"
 				:disabled="isSubmitting"
 				:formControl="{ validateOnValueUpdate: $form.password?.invalid }"
 			/>
 		</div>
+		<AccountSafetyInfo />
 		<Button type="submit" label="Login" :disabled="isSubmitting" size="large" />
 		<div class="submissionFeedback">
 			<ProgressSpinner v-if="isSubmitting" />
