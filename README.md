@@ -47,4 +47,14 @@ npm run start
 Logo based on the spoon and frame doodle drawings from [Khushmeen Sidhu's Doodle icons set](https://khushmeen.com/icons.html). The placeholder image used for recipes without an image or that have a broken image is the [Knife and Fork Twitter Emoji icon](https://iconscout.com/free-icon/fork-and-knife-cooking-kitchen-emoj-symbol).
 
 ## Future plans
+- Add to recipe selection view:
+  - sorting
+  - grouping
+  - filtering
+- Move to parse-ingredient library to remove headers
+- Use key for indicating which ingredients are from which recipes
+- Maybe use a third-party library to get more ingredients info
+  - Show images
+  - Group by aisle
 - Maybe provide an option to use without Paprika by allowing users to sign-up for local accounts and save their recipes directly in Spoon Fed, emulating the Paprika API to use the recipes.
+- Update to work offline
