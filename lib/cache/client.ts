@@ -8,12 +8,28 @@ export class Cache {
 		const keyv = await this.getKeyv();
 		return keyv.get(key);
 	}
-	async set(key: string, value: unknown, cacheTtl?: number) {
+	async set(
+		key: string,
+		value: unknown,
+		{ cacheTtl }: { cacheTtl?: number } = {},
+	) {
 		if (typeof window !== "undefined") {
 			return window.localStorage.setItem(key, JSON.stringify(value));
 		}
 		const keyv = await this.getKeyv();
 		return keyv.set(key, value, cacheTtl);
+	}
+	async memo(
+		key: string,
+		getSource: () => unknown,
+		{ cacheTtl }: { cacheTtl?: number } = {},
+	) {
+		let result = await this.get(key);
+		if (!result) {
+			result = await getSource();
+			await this.set(key, result, { cacheTtl });
+		}
+		return result;
 	}
 	private keyv: Keyv | undefined;
 	private getKeyv = async () => {

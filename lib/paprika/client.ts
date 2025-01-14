@@ -1,5 +1,6 @@
 import packageJson from "../../package.json";
 import { Cache } from "../cache/client";
+import { hashString } from "../utils/security";
 import { PaprikaApiError, PaprikaApiInvalidLoginDetailsError } from "./errors";
 import type {
 	Category,
@@ -12,14 +13,16 @@ import type {
 export class Paprika {
 	private rootUrl = "https://www.paprikaapp.com/api/v1/sync";
 	private auth: string;
+	private userHash: string | undefined;
 
 	constructor(loginDetails: LoginDetails) {
 		this.auth = Paprika.getAuth(loginDetails);
 	}
 
 	async recipes() {
-		const cacheTtl = 1000 * 10;
-		return await this.fetch<RecipeIndexItem[]>("recipes", { cacheTtl });
+		return await this.fetch<RecipeIndexItem[]>("recipes", {
+			cacheTtl: 10 * 1000,
+		});
 	}
 
 	async recipe(uid: string, hash: string) {
@@ -31,7 +34,7 @@ export class Paprika {
 	}
 
 	async status() {
-		return await this.fetch<Status[]>("status");
+		return await this.fetch<Status[]>("status", { cacheTtl: 30 * 1000 });
 	}
 
 	async loginDetailsAreValid(): Promise<boolean> {
@@ -57,27 +60,28 @@ export class Paprika {
 		{ cacheKey, cacheTtl }: { cacheKey?: string; cacheTtl?: number } = {},
 	): Promise<T> {
 		const cache = new Cache();
-		let fullCacheKey = `paprika:${this.auth}:${endpointPath}`;
-		if (cacheKey) {
-			fullCacheKey += `:${cacheKey}`;
+		if (!this.userHash) {
+			this.userHash = await hashString(this.auth);
 		}
-		let data: T | undefined = await cache.get(fullCacheKey);
-		const headers = {
-			Authorization: `Basic ${this.auth}`,
-			"User-Agent": `spoon-fed (see ${packageJson.repository} for more info and contact ${packageJson.author} if there are any issues)`,
-		};
-		if (!data) {
-			const res = await fetch(`${this.rootUrl}/${endpointPath}`, { headers });
-			if (!res.ok) {
-				if (res.status === 401) {
-					throw new PaprikaApiInvalidLoginDetailsError();
+		const fullCacheKey = `paprika:${this.userHash}:${endpointPath}${cacheKey ? `:${cacheKey}` : ""}`;
+		return cache.memo(
+			fullCacheKey,
+			async () => {
+				const headers = {
+					Authorization: `Basic ${this.auth}`,
+					"User-Agent": `spoon-fed (see ${packageJson.repository} for more info and contact ${packageJson.author} if there are any issues)`,
+				};
+				const res = await fetch(`${this.rootUrl}/${endpointPath}`, { headers });
+				if (!res.ok) {
+					if (res.status === 401) {
+						throw new PaprikaApiInvalidLoginDetailsError();
+					}
+					throw new PaprikaApiError();
 				}
-				throw new PaprikaApiError();
-			}
-			const resBody: { result: T } = await res.json();
-			data = resBody.result;
-			cache.set(fullCacheKey, data, cacheTtl);
-		}
-		return data;
+				const resBody: { result: T } = await res.json();
+				return resBody.result;
+			},
+			{ cacheTtl },
+		);
 	}
 }
