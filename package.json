@@ -4,6 +4,7 @@
 	"type": "module",
 	"author": "Callum Gare <callum@gare.au>",
 	"repository": "https://github.com/callumgare/spoon-fed",
+	"license": "MIT",
 	"scripts": {
 		"build": "nuxt build",
 		"dev": "nuxt dev",
