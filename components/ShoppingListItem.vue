@@ -29,6 +29,7 @@ const props = defineProps<{
   display: flex;
   padding: 1em;
   gap: 1em;
+  align-items: center;
 
   .core {
     font-weight: bold;

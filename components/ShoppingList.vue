@@ -9,7 +9,7 @@ const { shoppingListItems } = useShoppingList();
     </li>
   </TransitionGroup>
   <div v-else>
-    No shopping list items. Please select some recipes to add ingredients to the shopping list.
+    No shopping list items. Please select some recipes to add ingredients to your shopping list.
   </div>
 </template>
 
@@ -18,6 +18,7 @@ const { shoppingListItems } = useShoppingList();
   padding-left: 0;
   li {
     list-style-type: none;
+    width: fit-content;
   }
 
 
