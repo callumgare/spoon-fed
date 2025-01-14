@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useCycleList } from "@vueuse/core";
 import type { Recipe } from "~/lib/paprika/types";
 
 const props = defineProps<{
@@ -8,15 +9,14 @@ const props = defineProps<{
 const recipeId = computed(() => props.recipe?.uid || "");
 const selectionQty = useRecipeSelectionQty(recipeId);
 const imageSrcFallback = "/images/fork.svg";
-const imageSrc = ref(props.recipe?.image_url || imageSrcFallback);
-watch(
-	() => props.recipe?.image_url,
-	() => {
-		if (props.recipe?.image_url) {
-			imageSrc.value = props.recipe.image_url;
-		}
-	},
-);
+const listOfImageSrcs = computed(() => [
+	...(props.recipe?.photo_url ? [props.recipe?.photo_url] : []),
+	...(props.recipe?.image_url ? [props.recipe?.image_url] : []),
+	imageSrcFallback,
+]);
+
+const { state: imageSrc, next, go } = useCycleList(listOfImageSrcs);
+watch(listOfImageSrcs, () => go(0));
 </script>
 
 <template>
@@ -30,7 +30,7 @@ watch(
         alt=""
         :src="imageSrc"
         :class="{fallback: imageSrc === imageSrcFallback}"
-        @error="imageSrc = imageSrcFallback"
+        @error="next()"
       />
     </template>
     <template #title>
