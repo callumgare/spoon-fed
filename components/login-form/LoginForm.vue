@@ -3,7 +3,6 @@ import { Form, type FormSubmitEvent } from "@primevue/forms";
 import { zodResolver } from "@primevue/forms/resolvers/zod";
 import { z } from "zod";
 import { Paprika } from "~/lib/paprika/client";
-import { loginDetailsAreValid } from "~/lib/utils/valiation";
 
 const settings = useSettingsStore();
 
@@ -23,17 +22,18 @@ const submitHandler = async (event: FormSubmitEvent) => {
 	try {
 		const formValues = values as z.infer<typeof formSchema>; // We can safely cast since we
 		// know that if valid is true then the form has been validated by the form schema
-		if (await loginDetailsAreValid(formValues)) {
+		const paprika = new Paprika({ ...formValues, rootUrl: "/api/paprika" });
+		if (await paprika.loginDetailsAreValid()) {
 			settings.value = {
 				email: values.email,
 				auth: Paprika.getAuth(formValues),
 			};
+			await navigateTo("/");
 		} else {
 			generalFormError.value = {
 				message: "Email and/or password is wrong",
 			};
 		}
-		await navigateTo("/");
 	} catch (error) {
 		generalFormError.value = {
 			message: "An unknown error occurred. Sorry about that :(",

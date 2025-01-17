@@ -10,13 +10,20 @@ import type {
 	Status,
 } from "./types";
 
+type Props = {
+	rootUrl?: string;
+} & LoginDetails;
+
 export class Paprika {
 	private rootUrl = "https://www.paprikaapp.com/api/v1/sync";
 	private auth: string;
 	private userHash: string | undefined;
 
-	constructor(loginDetails: LoginDetails) {
-		this.auth = Paprika.getAuth(loginDetails);
+	constructor(props: Props) {
+		this.auth = Paprika.getAuth(props);
+		if (props.rootUrl) {
+			this.rootUrl = props.rootUrl;
+		}
 	}
 
 	async recipes() {
@@ -26,7 +33,11 @@ export class Paprika {
 	}
 
 	async recipe(uid: string, hash: string) {
-		return await this.fetch<Recipe>(`recipe/${uid}`, { cacheKey: hash });
+		// The hash query param isn't used by the actual paprika url, just our
+		// proxy so we know if the cached copy has expired or not
+		return await this.fetch<Recipe>(`recipe/${uid}?hash=${hash}`, {
+			cacheKey: hash,
+		});
 	}
 
 	async categories() {
@@ -71,7 +82,10 @@ export class Paprika {
 					Authorization: `Basic ${this.auth}`,
 					"User-Agent": `spoon-fed (see ${packageJson.repository} for more info and contact ${packageJson.author} if there are any issues)`,
 				};
-				const res = await fetch(`${this.rootUrl}/${endpointPath}`, { headers });
+				const res = await fetch(
+					`${this.rootUrl.replace(/\/+#/, "")}/${endpointPath}`,
+					{ headers },
+				);
 				if (!res.ok) {
 					if (res.status === 401) {
 						throw new PaprikaApiInvalidLoginDetailsError();

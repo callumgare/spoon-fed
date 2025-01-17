@@ -19,11 +19,11 @@ export class Cache {
 		const keyv = await this.getKeyv();
 		return keyv.set(key, value, cacheTtl);
 	}
-	async memo(
+	async memo<T>(
 		key: string,
-		getSource: () => unknown,
+		getSource: () => T,
 		{ cacheTtl }: { cacheTtl?: number } = {},
-	) {
+	): Promise<T> {
 		let result = await this.get(key);
 		if (!result) {
 			result = await getSource();
