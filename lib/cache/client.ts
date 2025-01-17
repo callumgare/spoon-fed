@@ -58,7 +58,6 @@ export class Cache {
 				throw Error(`CACHE_URL is invalid: ${cacheUrl}`);
 			}
 			this.keyv = new Keyv({ store: store });
-			this.keyv = new Keyv();
 		}
 		return this.keyv;
 	};
