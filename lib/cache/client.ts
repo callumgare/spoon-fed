@@ -1,4 +1,10 @@
 import Keyv, { type KeyvStoreAdapter } from "keyv";
+import type { Promisable } from "type-fest";
+
+export type CacheTtlParam<T> =
+	| number
+	| undefined
+	| ((data: T) => Promisable<number | undefined>);
 
 export class Cache {
 	async get(key: string) {
@@ -8,21 +14,23 @@ export class Cache {
 		const keyv = await this.getKeyv();
 		return keyv.get(key);
 	}
-	async set(
+	async set<T>(
 		key: string,
-		value: unknown,
-		{ cacheTtl }: { cacheTtl?: number } = {},
+		value: T,
+		{ cacheTtl }: { cacheTtl?: CacheTtlParam<T> } = {},
 	) {
 		if (typeof window !== "undefined") {
 			return window.localStorage.setItem(key, JSON.stringify(value));
 		}
 		const keyv = await this.getKeyv();
-		return keyv.set(key, value, cacheTtl);
+		const cacheTtlNumber =
+			typeof cacheTtl === "function" ? await cacheTtl(value) : cacheTtl;
+		return await keyv.set(key, value, cacheTtlNumber);
 	}
 	async memo<T>(
 		key: string,
-		getSource: () => T,
-		{ cacheTtl }: { cacheTtl?: number } = {},
+		getSource: () => Promisable<T>,
+		{ cacheTtl }: { cacheTtl?: CacheTtlParam<T> } = {},
 	): Promise<T> {
 		let result = await this.get(key);
 		if (!result) {

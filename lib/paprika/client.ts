@@ -1,5 +1,6 @@
 import packageJson from "../../package.json";
-import { Cache } from "../cache/client";
+import { Cache, type CacheTtlParam } from "../cache/client";
+import { getExpiresInFromUrl } from "../utils/s3";
 import { hashString } from "../utils/security";
 import { PaprikaApiError, PaprikaApiInvalidLoginDetailsError } from "./errors";
 import type {
@@ -37,11 +38,12 @@ export class Paprika {
 		// proxy so we know if the cached copy has expired or not
 		return await this.fetch<Recipe>(`recipe/${uid}?hash=${hash}`, {
 			cacheKey: hash,
+			cacheTtl: (data) => getExpiresInFromUrl(data.photo_url), // Ideally we could cache this forever because of hash as the cacheKey but photo_url isn't included in the hash calculation and changes on every request due to only being is only valid for 10 minutes
 		});
 	}
 
 	async categories() {
-		return await this.fetch<Category[]>("categories");
+		return await this.fetch<Category[]>("categories", { cacheTtl: 10 * 1000 });
 	}
 
 	async status() {
@@ -68,7 +70,13 @@ export class Paprika {
 
 	private async fetch<T>(
 		endpointPath: string,
-		{ cacheKey, cacheTtl }: { cacheKey?: string; cacheTtl?: number } = {},
+		{
+			cacheKey,
+			cacheTtl,
+		}: {
+			cacheKey?: string;
+			cacheTtl?: CacheTtlParam<T>;
+		} = {},
 	): Promise<T> {
 		const cache = new Cache();
 		if (!this.userHash) {
