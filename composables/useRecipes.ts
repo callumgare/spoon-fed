@@ -48,7 +48,9 @@ export const useRecipes = createGlobalState(() => {
 					const cacheKey = `recipe:${recipeIndex.uid}:${recipeIndex.hash}`;
 					const recipe = await cache.memo(cacheKey, async () => {
 						await rateLimiter.waitTillReadyForNext();
-						return await paprika.recipe(recipeIndex.uid, recipeIndex.hash);
+						return await paprika.recipe(recipeIndex.uid, {
+							hash: recipeIndex.hash,
+						});
 					});
 					recipes.value.push(recipe);
 				}

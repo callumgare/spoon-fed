@@ -11,43 +11,52 @@ import type {
 	Status,
 } from "./types";
 
-type Props = {
+type ConstructorProps = {
 	rootUrl?: string;
 } & LoginDetails;
+
+type EndpointSharedOptions<T> = {
+	cacheTtl?: CacheTtlParam<T>;
+	cacheKey?: string;
+};
 
 export class Paprika {
 	private rootUrl = "https://www.paprikaapp.com/api/v1/sync";
 	private auth: string;
 	private userHash: string | undefined;
 
-	constructor(props: Props) {
+	constructor(props: ConstructorProps) {
 		this.auth = Paprika.getAuth(props);
 		if (props.rootUrl) {
 			this.rootUrl = props.rootUrl;
 		}
 	}
 
-	async recipes() {
-		return await this.fetch<RecipeIndexItem[]>("recipes", {
-			cacheTtl: 10 * 1000,
-		});
+	async recipes(options: EndpointSharedOptions<RecipeIndexItem[]> = {}) {
+		return await this.fetch<RecipeIndexItem[]>("recipes", options);
 	}
 
-	async recipe(uid: string, hash: string) {
+	async recipe(
+		uid: string,
+		options: EndpointSharedOptions<Recipe> & { hash?: string },
+	) {
 		// The hash query param isn't used by the actual paprika url, just our
 		// proxy so we know if the cached copy has expired or not
-		return await this.fetch<Recipe>(`recipe/${uid}?hash=${hash}`, {
-			cacheKey: hash,
-			cacheTtl: (data) => getExpiresInFromUrl(data.photo_url), // Ideally we could cache this forever because of hash as the cacheKey but photo_url isn't included in the hash calculation and changes on every request due to only being is only valid for 10 minutes
+		return await this.fetch<Recipe>(`recipe/${uid}?hash=${options.hash}`, {
+			cacheKey: options.hash,
+			cacheTtl: options.hash
+				? (data) => getExpiresInFromUrl(data.photo_url)
+				: 0, // Ideally we could cache this forever because of hash as the cacheKey but photo_url isn't included in the hash calculation and changes on every request due to only being is only valid for 10 minutes,
+			...options,
 		});
 	}
 
-	async categories() {
-		return await this.fetch<Category[]>("categories", { cacheTtl: 10 * 1000 });
+	async categories(options: EndpointSharedOptions<Category[]> = {}) {
+		return await this.fetch<Category[]>("categories", options);
 	}
 
-	async status() {
-		return await this.fetch<Status[]>("status", { cacheTtl: 30 * 1000 });
+	async status(options: EndpointSharedOptions<Status[]> = {}) {
+		return await this.fetch<Status[]>("status", options);
 	}
 
 	async loginDetailsAreValid(): Promise<boolean> {
@@ -70,18 +79,13 @@ export class Paprika {
 
 	private async fetch<T>(
 		endpointPath: string,
-		{
-			cacheKey,
-			cacheTtl,
-		}: {
-			cacheKey?: string;
-			cacheTtl?: CacheTtlParam<T>;
-		} = {},
+		options: EndpointSharedOptions<T> = {},
 	): Promise<T> {
 		const cache = new Cache();
 		if (!this.userHash) {
 			this.userHash = await hashString(this.auth);
 		}
+		const { cacheKey } = options;
 		const fullCacheKey = `paprika:${this.userHash}:${endpointPath}${cacheKey ? `:${cacheKey}` : ""}`;
 		return cache.memo(
 			fullCacheKey,
@@ -103,7 +107,7 @@ export class Paprika {
 				const resBody: { result: T } = await res.json();
 				return resBody.result;
 			},
-			{ cacheTtl },
+			{ cacheTtl: "cacheTtl" in options ? options.cacheTtl : 0 },
 		);
 	}
 }

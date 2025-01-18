@@ -19,6 +19,6 @@ export default defineEventHandler(async (event) => {
 			}).parse,
 		);
 		const paprika = getPaprikaClient(event);
-		return paprika.recipe(uid, hash);
+		return paprika.recipe(uid, { hash });
 	});
 });
