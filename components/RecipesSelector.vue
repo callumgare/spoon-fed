@@ -10,7 +10,7 @@ const props = defineProps<{
 <template>
   <ul>
     <li v-for="recipe in recipes">
-      <RecipeCard :recipe="recipe" />
+      <RecipeCard :recipe="recipe" :key="recipe?.uid" />
     </li>
   </ul>
 </template>

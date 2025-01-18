@@ -1,6 +1,10 @@
 <script setup lang="ts">
-const { recipes, recipesWithLoading, status, total } = useRecipes();
+import RecipeResultsControls from "~/components/RecipeResultsControls.vue";
+
+const { recipes, status, total } = useRecipes();
 const settings = useSettingsStore();
+
+const { results } = useRecipeResults();
 
 function handleLogout() {
 	settings.value.auth = "";
@@ -28,7 +32,8 @@ function handleLogout() {
 			</TabList>
 			<TabPanels>
 				<TabPanel value="recipes">
-					<RecipesSelector :recipes="recipesWithLoading" />
+					<RecipeResultsControls />
+					<RecipesSelector :recipes="results.recipes" />
 				</TabPanel>
 				<TabPanel value="shoppingList">
 					<ShoppingList />
@@ -78,6 +83,11 @@ function handleLogout() {
 				flex-wrap: wrap;
 				gap: 1rem;
 			}
+		}
+		:deep(.p-tabpanel) {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
 		}
 		
 	}
