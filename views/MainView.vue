@@ -12,15 +12,15 @@ function handleLogout() {
 	<div class="MainView" key="MainView">
 		<nav class="site">
 			<SiteLogo size="small" />
+			<RecipesLoadingBar
+				v-if="status === 'pending' && total"
+				:loaded="recipes.length"
+				:total="total || 100"
+			/>
 			<div class="options">
 				<Button label="Logout" icon="pi pi-sign-out" severity="secondary" @click="handleLogout"/>
 			</div>
 		</nav>
-		<RecipesLoadingBar
-			v-if="status === 'pending' && total"
-			:loaded="recipes.length"
-			:total="total"
-		/>
 		<Tabs value="recipes" class="tabs">
 			<TabList>
 				<Tab value="recipes">Recipes</Tab>
@@ -47,6 +47,10 @@ function handleLogout() {
 		gap: 1rem;
 		padding: clamp(0rem, calc(1vw), 2rem);
 		padding-bottom: 0;
+
+		.RecipesLoadingBar {
+			flex: 1 1 auto;
+		}
 	}
 	.tabs {
 		:deep(.p-tablist-content) {
