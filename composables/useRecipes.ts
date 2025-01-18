@@ -12,9 +12,13 @@ export const useRecipes = createGlobalState(() => {
 		rateLimit: 1000 * 1, // Rate limit to 1 per second
 	});
 
-	const recipesIndex = useAsyncData("recipes", () => paprika.recipes(), {
-		server: false,
-	});
+	const recipesIndex = useAsyncData(
+		"recipes",
+		() => paprika.recipes({ cacheTtl: 10 * 1000 }),
+		{
+			server: false,
+		},
+	);
 
 	const status = ref<AsyncDataRequestStatus>(recipesIndex.status.value);
 	watch(recipesIndex.status, () => {
@@ -42,22 +46,26 @@ export const useRecipes = createGlobalState(() => {
 	]);
 	watch(recipesIndex.data, async () => {
 		// If we have a lot of recipes already in cache then we're going to add them to "recipes" at a very high rate
-		// which will cause any computed refs and watches to do a bunch of calculation that will just be immediately 
+		// which will cause any computed refs and watches to do a bunch of calculation that will just be immediately
 		// replaced. Instead we queue up new recipes and load every half a second.
-		let recipeQueue: Recipe[] = []
+		let recipeQueue: Recipe[] = [];
 		const processRecipeQueue = () => {
 			if (!recipeQueue.length) {
-				return
+				return;
 			}
-			recipes.value.push(...recipeQueue)
-			recipeQueue = []
-		}
-		const intervalId = setInterval(processRecipeQueue, 500)
+			recipes.value.push(...recipeQueue);
+			recipeQueue = [];
+		};
+		const intervalId = setInterval(processRecipeQueue, 500);
 		if (recipesIndex.data.value) {
 			try {
 				for await (const recipeIndex of recipesIndex.data.value) {
-					const recipe = await paprika.recipe(recipeIndex.uid, recipeIndex.hash);
-					recipeQueue.push(recipe);
+					recipeQueue.push(
+						await paprika.recipe(recipeIndex.uid, {
+							hash: recipeIndex.hash,
+							cacheTtl: undefined, // We cache forever since a hash change will break the cache
+						}),
+					);
 				}
 				status.value = "success";
 			} catch (error) {
@@ -65,8 +73,8 @@ export const useRecipes = createGlobalState(() => {
 				status.value = "error";
 			}
 		}
-		clearInterval(intervalId)
-		processRecipeQueue()
+		clearInterval(intervalId);
+		processRecipeQueue();
 	});
 
 	return {

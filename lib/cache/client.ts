@@ -9,7 +9,20 @@ export type CacheTtlParam<T> =
 export class Cache {
 	async get(key: string) {
 		if (typeof window !== "undefined") {
-			return JSON.parse(window.localStorage.getItem(key) ?? "null");
+			const storedResult = JSON.parse(
+				window.localStorage.getItem(key) ?? "null",
+			);
+			if (!storedResult) {
+				return undefined;
+			}
+			if (
+				storedResult.expiresOn !== null &&
+				storedResult.expiresOn < Date.now()
+			) {
+				await this.delete(key);
+				return undefined;
+			}
+			return storedResult.data;
 		}
 		const keyv = await this.getKeyv();
 		return keyv.get(key);
@@ -18,14 +31,35 @@ export class Cache {
 		key: string,
 		value: T,
 		{ cacheTtl }: { cacheTtl?: CacheTtlParam<T> } = {},
-	) {
-		if (typeof window !== "undefined") {
-			return window.localStorage.setItem(key, JSON.stringify(value));
-		}
-		const keyv = await this.getKeyv();
+	): Promise<boolean> {
 		const cacheTtlNumber =
 			typeof cacheTtl === "function" ? await cacheTtl(value) : cacheTtl;
+		if (cacheTtlNumber === 0) {
+			return true;
+		}
+		if (typeof window !== "undefined") {
+			window.localStorage.setItem(
+				key,
+				JSON.stringify({
+					expiresOn:
+						typeof cacheTtlNumber === "number"
+							? Date.now() + cacheTtlNumber
+							: null,
+					data: value,
+				}),
+			);
+			return true;
+		}
+		const keyv = await this.getKeyv();
 		return await keyv.set(key, value, cacheTtlNumber);
+	}
+	async delete(key: string): Promise<boolean> {
+		if (typeof window !== "undefined") {
+			window.localStorage.removeItem(key);
+			return true;
+		}
+		const keyv = await this.getKeyv();
+		return await keyv.delete(key);
 	}
 	async memo<T>(
 		key: string,
