@@ -41,11 +41,23 @@ export const useRecipes = createGlobalState(() => {
 		),
 	]);
 	watch(recipesIndex.data, async () => {
+		// If we have a lot of recipes already in cache then we're going to add them to "recipes" at a very high rate
+		// which will cause any computed refs and watches to do a bunch of calculation that will just be immediately 
+		// replaced. Instead we queue up new recipes and load every half a second.
+		let recipeQueue: Recipe[] = []
+		const processRecipeQueue = () => {
+			if (!recipeQueue.length) {
+				return
+			}
+			recipes.value.push(...recipeQueue)
+			recipeQueue = []
+		}
+		const intervalId = setInterval(processRecipeQueue, 500)
 		if (recipesIndex.data.value) {
 			try {
 				for await (const recipeIndex of recipesIndex.data.value) {
 					const recipe = await paprika.recipe(recipeIndex.uid, recipeIndex.hash);
-					recipes.value.push(recipe);
+					recipeQueue.push(recipe);
 				}
 				status.value = "success";
 			} catch (error) {
@@ -53,6 +65,8 @@ export const useRecipes = createGlobalState(() => {
 				status.value = "error";
 			}
 		}
+		clearInterval(intervalId)
+		processRecipeQueue()
 	});
 
 	return {
