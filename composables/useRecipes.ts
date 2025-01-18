@@ -37,6 +37,8 @@ export const useRecipes = createGlobalState(() => {
 		total.value = recipesIndex.data.value?.length;
 	});
 
+	const { refreshCategories, getCategoryById } = useCategories();
+
 	const recipes = ref<Recipe[]>([]);
 	const recipesWithLoading = computed((): (Recipe | null)[] => [
 		...recipes.value,
@@ -60,12 +62,16 @@ export const useRecipes = createGlobalState(() => {
 		if (recipesIndex.data.value) {
 			try {
 				for await (const recipeIndex of recipesIndex.data.value) {
-					recipeQueue.push(
-						await paprika.recipe(recipeIndex.uid, {
-							hash: recipeIndex.hash,
-							cacheTtl: undefined, // We cache forever since a hash change will break the cache
-						}),
-					);
+					const recipe = await paprika.recipe(recipeIndex.uid, {
+						hash: recipeIndex.hash,
+						cacheTtl: undefined, // We cache forever since a hash change will break the cache
+					});
+					for (const categoryId of recipe.categories) {
+						if (!getCategoryById(categoryId)) {
+							await refreshCategories();
+						}
+					}
+					recipeQueue.push(recipe);
 				}
 				status.value = "success";
 			} catch (error) {

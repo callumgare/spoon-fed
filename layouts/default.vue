@@ -35,7 +35,8 @@ html {
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   font-family: Inter var, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
   font-size: 14px;
-  line-height: normal
+  line-height: normal;
+	background-color: var(--p-content-background);
 }
 
 /* Taken from https://css-tricks.com/inclusively-hidden/ */
