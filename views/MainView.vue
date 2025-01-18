@@ -82,19 +82,25 @@ function handleLogout() {
 			flex-wrap: wrap;
 			background: var(--p-tabs-tablist-background);
 			z-index: 1;
-	
+
 			.options {
 				display: flex;
 				flex-wrap: wrap;
 				gap: 1rem;
 			}
 		}
+
+		:deep(.p-tab) {
+			font-size: 1.3rem;
+		}
+
 		:deep(.p-tabpanel) {
 			display: flex;
 			flex-direction: column;
 			align-items: center;
 			gap: 1rem;
 		}
+
 		h3 {
 			text-align: center;
   		font-size: 2rem;

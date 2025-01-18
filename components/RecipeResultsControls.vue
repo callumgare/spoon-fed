@@ -76,6 +76,7 @@ const categoryFilterSelectedModel = computed({
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
+  justify-content: center;
 
   .p-inputwrapper {
     min-width: 15rem;
