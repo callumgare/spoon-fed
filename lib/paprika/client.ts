@@ -1,5 +1,6 @@
 import packageJson from "../../package.json";
 import { Cache, type CacheTtlParam } from "../cache/client";
+import { RateLimiter } from "../utils/flow";
 import { getExpiresInFromUrl } from "../utils/s3";
 import { hashString } from "../utils/security";
 import { PaprikaApiError, PaprikaApiInvalidLoginDetailsError } from "./errors";
@@ -13,6 +14,7 @@ import type {
 
 type ConstructorProps = {
 	rootUrl?: string;
+	rateLimit?: number;
 } & LoginDetails;
 
 type EndpointSharedOptions<T> = {
@@ -24,11 +26,15 @@ export class Paprika {
 	private rootUrl = "https://www.paprikaapp.com/api/v1/sync";
 	private auth: string;
 	private userHash: string | undefined;
+	private rateLimiter: RateLimiter | undefined;
 
 	constructor(props: ConstructorProps) {
 		this.auth = Paprika.getAuth(props);
 		if (props.rootUrl) {
 			this.rootUrl = props.rootUrl;
+		}
+		if (props.rateLimit) {
+			this.rateLimiter = new RateLimiter(props.rateLimit);
 		}
 	}
 
@@ -90,6 +96,9 @@ export class Paprika {
 		return cache.memo(
 			fullCacheKey,
 			async () => {
+				if (this.rateLimiter) {
+					await this.rateLimiter.waitTillReadyForNext();
+				}
 				const headers = {
 					Authorization: `Basic ${this.auth}`,
 					"User-Agent": `spoon-fed (see ${packageJson.repository} for more info and contact ${packageJson.author} if there are any issues)`,
