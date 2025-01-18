@@ -12,6 +12,8 @@ export type RecipeGroup = {
 	recipes: Recipe[];
 };
 
+type GroupBy = "difficulty";
+
 export const useRecipeResults = createGlobalState(() => {
 	const filters = useLocalStorage<Filter[]>(
 		"filters",
@@ -26,6 +28,9 @@ export const useRecipeResults = createGlobalState(() => {
 			initOnMounted: true,
 		},
 	);
+	const groupBy = useLocalStorage<GroupBy | null>("groupBy", null, {
+		initOnMounted: true,
+	});
 	const { recipes } = useRecipes();
 	const { includeSubcategories, getCategoryById } = useCategories();
 	const results = computed(() => {
@@ -53,13 +58,43 @@ export const useRecipeResults = createGlobalState(() => {
 				}
 			});
 		});
-		return {
-			groupedValue: undefined,
-			recipes: filteredRecipes,
-		} satisfies RecipeGroup;
+		const groupedRecipes: RecipeGroup[] = Object.entries(
+			Object.groupBy(filteredRecipes, (recipe) =>
+				groupBy.value ? recipe[groupBy.value] : "",
+			),
+		)
+			.map(([groupedValue, recipes]) => ({
+				groupedValue,
+				recipes: recipes ?? [],
+			}))
+			.toSorted((a, b) =>
+				groupBy.value
+					? recipePropSortCompare(a.groupedValue, b.groupedValue, groupBy.value)
+					: 0,
+			);
+		return groupedRecipes;
 	});
 	return {
 		filters,
 		results,
+		groupBy,
 	};
 });
+
+function recipePropSortCompare(a: unknown, b: unknown, groupBy: GroupBy) {
+	if (groupBy === "difficulty") {
+		if (typeof a !== "string" || typeof b !== "string") {
+			throw new Error(
+				`Grouping by ${groupBy} but value for one or both compared elements is not a string`,
+			);
+		}
+		const difficultySortOrder = ["easy", "medium", "hard"];
+		const getSortValue = (value: string) =>
+			difficultySortOrder.indexOf(value.toLocaleLowerCase()) !== -1
+				? difficultySortOrder.indexOf(value.toLocaleLowerCase())
+				: difficultySortOrder.length;
+		return getSortValue(a) - getSortValue(b);
+	}
+	groupBy satisfies never;
+	throw new Error(`Unrecognised groupBy value: ${groupBy}`);
+}

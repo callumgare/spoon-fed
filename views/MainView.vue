@@ -33,7 +33,12 @@ function handleLogout() {
 			<TabPanels>
 				<TabPanel value="recipes">
 					<RecipeResultsControls />
-					<RecipesSelector :recipes="results.recipes" />
+					<div v-for="recipeGroup in results">
+						<h3 v-if="results.length !== 1 || recipeGroup.groupedValue">
+							{{ recipeGroup.groupedValue || "No Group Value" }}
+						</h3>
+						<RecipesSelector :recipes="recipeGroup.recipes" />
+					</div>
 				</TabPanel>
 				<TabPanel value="shoppingList">
 					<ShoppingList />
@@ -88,8 +93,12 @@ function handleLogout() {
 			display: flex;
 			flex-direction: column;
 			align-items: center;
+			gap: 1rem;
 		}
-		
+		h3 {
+			text-align: center;
+  		font-size: 2rem;
+		}
 	}
 	@media (max-width: 500px) {
 		nav.site {

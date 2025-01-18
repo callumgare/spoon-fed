@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { filters } = useRecipeResults();
+const { filters, groupBy } = useRecipeResults();
 const { createCategoriesTree } = useCategories();
 
 const tree = createCategoriesTree({
@@ -24,9 +24,12 @@ const categoryFilterSelectedModel = computed({
 		);
 	},
 	set(selectedNodes) {
-		const selectedCategoryIds = Object.entries(selectedNodes)
-			.filter((entry) => entry[1].checked)
-			.map((entry) => entry[0]);
+		let selectedCategoryIds: string[] = [];
+		if (selectedNodes) {
+			selectedCategoryIds = Object.entries(selectedNodes)
+				.filter((entry) => entry[1].checked)
+				.map((entry) => entry[0]);
+		}
 		const categoryFilter = filters.value.find(
 			(filter) => filter.field === "categories",
 		);
@@ -35,24 +38,47 @@ const categoryFilterSelectedModel = computed({
 		}
 	},
 });
-
-const selectedValue = ref(null);
 </script>
 
 <template>
-  <Fieldset legend="Filters">
-    <FloatLabel class="w-full md:w-80" variant="in">
-      <TreeSelect
-        v-model="categoryFilterSelectedModel"
-        :options="tree"
-        selectionMode="checkbox"
-        placeholder="Select a category"
-        inputId="categoryFilter"
-      />
-      <label for="categoryFilter">Categories</label>
-    </FloatLabel>
-  </Fieldset>
+  <div class="RecipeResultsControls">
+    <Fieldset legend="Filters">
+      <FloatLabel variant="in">
+        <TreeSelect
+          v-model="categoryFilterSelectedModel"
+          :options="tree"
+          selectionMode="checkbox"
+          inputId="categoryFilter"
+          showClear
+        />
+        <label for="categoryFilter">Categories</label>
+      </FloatLabel>
+    </Fieldset>
+    <Fieldset legend="Group By">
+      <FloatLabel variant="in">
+        <Select
+          v-model="groupBy"
+          :options="[{value: 'difficulty', label: 'Difficulty'}]"
+          selectionMode="checkbox"
+          inputId="recipeFieldGroupBy"
+          showClear
+          optionLabel="label"
+          optionValue="value"
+        />
+        <label for="recipeFieldGroupBy">Recipe Field</label>
+      </FloatLabel>
+    </Fieldset>
+  </div>
 </template>
 
 <style scoped>
+.RecipeResultsControls {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+
+  .p-inputwrapper {
+    min-width: 15rem;
+  }
+}
 </style>
