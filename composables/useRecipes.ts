@@ -1,22 +1,18 @@
 import { createGlobalState } from "@vueuse/core";
-import { Paprika } from "~/lib/paprika/client";
-import type { Recipe } from "~/lib/paprika/types";
+import type { Recipe, RecipeIndexItem } from "~/lib/paprika/types";
 import type { AsyncDataRequestStatus } from "#app";
 
 export const useRecipes = createGlobalState(() => {
-	const settings = useSettingsStore();
-
-	const paprika = new Paprika({
-		...settings.value,
-		rootUrl: "/api/paprika",
-		rateLimit: 1000 * 1, // Rate limit to 1 per second
-	});
+	const paprika = usePaprika();
 
 	const recipesIndex = useAsyncData(
 		"recipes",
-		() => paprika.recipes({ cacheTtl: 10 * 1000 }),
+		() =>
+			paprika.value?.recipes({ cacheTtl: 10 * 1000 }) ||
+			Promise.resolve([] as RecipeIndexItem[]),
 		{
 			server: false,
+			watch: [paprika],
 		},
 	);
 
@@ -62,7 +58,10 @@ export const useRecipes = createGlobalState(() => {
 		if (recipesIndex.data.value) {
 			try {
 				for await (const recipeIndex of recipesIndex.data.value) {
-					const recipe = await paprika.recipe(recipeIndex.uid, {
+					if (!paprika.value) {
+						break;
+					}
+					const recipe = await paprika.value.recipe(recipeIndex.uid, {
 						hash: recipeIndex.hash,
 						cacheTtl: undefined, // We cache forever since a hash change will break the cache
 					});

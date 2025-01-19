@@ -1,19 +1,18 @@
 import { createGlobalState } from "@vueuse/core";
-import { Paprika } from "~/lib/paprika/client";
 import type { Category } from "~/lib/paprika/types";
 
 export const useCategories = createGlobalState(() => {
-	const settings = useSettingsStore();
-
-	const paprika = new Paprika({
-		...settings.value,
-		rootUrl: "/api/paprika",
-		rateLimit: 1000 * 1, // Rate limit to 1 per second
-	});
+	const paprika = usePaprika();
 
 	const categories = ref<Category[]>([]);
 	async function refreshCategories() {
-		categories.value = await paprika.categories();
+		if (paprika.value) {
+			categories.value = await paprika.value.categories();
+		} else {
+			console.warn(
+				"Attempted to refresh categories before paprika client has loaded.",
+			);
+		}
 	}
 
 	function getCategoryById(id: string): Category | null {
