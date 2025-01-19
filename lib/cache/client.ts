@@ -1,4 +1,4 @@
-import Keyv, { type KeyvStoreAdapter } from "keyv";
+import Keyv, { type KeyvOptions } from "keyv";
 import type { Promisable } from "type-fest";
 
 export type CacheTtlParam<T> =
@@ -80,13 +80,12 @@ export class Cache {
 			const cacheUrl = (
 				process.env.CACHE_URL || process.env.CACHE_KV_URL
 			)?.trim();
+			const options: KeyvOptions = {};
 			if (!cacheUrl) {
-				throw Error("CACHE_URL not set");
-			}
-			let store: KeyvStoreAdapter | undefined;
-			if (cacheUrl.startsWith("/")) {
+				// CACHE_URL not set so only a memory cache is used
+			} else if (cacheUrl.startsWith("/")) {
 				const { KeyvFile } = await import("keyv-file");
-				store = new KeyvFile({
+				options.store = new KeyvFile({
 					filename: cacheUrl,
 					writeDelay: 100,
 				});
@@ -95,11 +94,11 @@ export class Cache {
 				cacheUrl.startsWith("rediss://")
 			) {
 				const { default: KeyvRedis } = await import("@keyv/redis");
-				store = new KeyvRedis(cacheUrl);
+				options.store = new KeyvRedis(cacheUrl);
 			} else {
 				throw Error(`CACHE_URL is invalid: ${cacheUrl}`);
 			}
-			this.keyv = new Keyv({ store: store });
+			this.keyv = new Keyv(options);
 		}
 		return this.keyv;
 	};

@@ -27,6 +27,7 @@ export class Paprika {
 	private auth: string;
 	private userHash: string | undefined;
 	private rateLimiter: RateLimiter | undefined;
+	private cache = new Cache();
 
 	constructor(props: ConstructorProps) {
 		this.auth = Paprika.getAuth(props);
@@ -90,13 +91,12 @@ export class Paprika {
 		endpointPath: string,
 		options: EndpointSharedOptions<T> = {},
 	): Promise<T> {
-		const cache = new Cache();
 		if (!this.userHash) {
 			this.userHash = await hashString(this.auth);
 		}
 		const { cacheKey } = options;
 		const fullCacheKey = `paprika:${this.userHash}:${endpointPath}${cacheKey ? `:${cacheKey}` : ""}`;
-		return cache.memo(
+		return this.cache.memo(
 			fullCacheKey,
 			async () => {
 				if (this.rateLimiter) {
