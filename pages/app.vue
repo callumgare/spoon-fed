@@ -15,6 +15,7 @@ const { results } = useRecipeResults();
 function handleLogout() {
 	settings.value.auth = "";
 	settings.value.email = "";
+	navigateTo("/");
 }
 </script>
 

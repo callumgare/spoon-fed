@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const settings = useSettingsStore();
 </script>
 
 <template>
@@ -21,7 +22,20 @@
 			</p>
 		</div>
 		<img src="/images/recipe-cards-screenshot.png" />
-		<Button as="router-link" label="Login With Paprika Account" to="/login" class="login" />
+		<Button
+			v-if="!settings.auth"
+			as="router-link"
+			label="Login With Paprika Account"
+			to="/login"
+			class="ctaButton login"
+		/>
+		<Button
+			v-else
+			as="router-link"
+			label="Show Recipes"
+			to="/app"
+			class="ctaButton openApp"
+		/>
 	</div>
 	
 </template>
@@ -55,7 +69,7 @@
 		display: block;
 	}
 
-	.login {
+	.ctaButton {
 		text-decoration: none;
 	}
 }
