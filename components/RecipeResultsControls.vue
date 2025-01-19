@@ -42,14 +42,14 @@ const categoryFilterSelectedModel = computed({
 
 <template>
   <div class="RecipeResultsControls">
-    <Fieldset legend="Filters">
+    <Fieldset legend="Filter">
       <FloatLabel variant="in">
         <TreeSelect
           v-model="categoryFilterSelectedModel"
           :options="tree"
           selectionMode="checkbox"
           inputId="categoryFilter"
-          showClear
+          :showClear="Object.values(categoryFilterSelectedModel).some(cat => cat.checked)"
         />
         <label for="categoryFilter">Categories</label>
       </FloatLabel>
@@ -80,6 +80,11 @@ const categoryFilterSelectedModel = computed({
 
   .p-inputwrapper {
     min-width: 15rem;
+  }
+
+  /* Small hack to fix the issue of clear button overlapping with selected items text */
+  :deep(.p-treeselect.p-inputwrapper-filled .p-treeselect-label) {
+    padding-right: 1.7rem;
   }
 }
 </style>
