@@ -38,7 +38,7 @@ export const useRecipes = createGlobalState(() => {
 	const recipes = ref<Recipe[]>([]);
 	const recipesWithLoading = computed((): (Recipe | null)[] => [
 		...recipes.value,
-		...new Array(total.value ? total.value - recipes.value.length : 0).fill(
+		...new Array(total.value ? total.value - recipes.value.length : 3).fill(
 			null,
 		),
 	]);

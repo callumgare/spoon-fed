@@ -9,7 +9,7 @@ export type Filter = {
 
 export type RecipeGroup = {
 	groupedValue: unknown;
-	recipes: Recipe[];
+	recipes: (Recipe | null)[];
 };
 
 type GroupBy = "difficulty";
@@ -31,10 +31,13 @@ export const useRecipeResults = createGlobalState(() => {
 	const groupBy = useLocalStorage<GroupBy | null>("groupBy", null, {
 		initOnMounted: true,
 	});
-	const { recipes } = useRecipes();
+	const { recipesWithLoading } = useRecipes();
 	const { includeSubcategories, getCategoryById } = useCategories();
 	const results = computed(() => {
-		const filteredRecipes = recipes.value.filter((recipe) => {
+		const filteredRecipes = recipesWithLoading.value.filter((recipe) => {
+			if (!recipe) {
+				return true; // Don't filter out results that are still loading
+			}
 			return filters.value.every((filter) => {
 				if (filter.operator === "includes some") {
 					if (filter.field === "categories") {
@@ -60,7 +63,7 @@ export const useRecipeResults = createGlobalState(() => {
 		});
 		const groupedRecipes: RecipeGroup[] = Object.entries(
 			Object.groupBy(filteredRecipes, (recipe) =>
-				groupBy.value ? recipe[groupBy.value] : "",
+				groupBy.value && recipe ? recipe[groupBy.value] : "",
 			),
 		)
 			.map(([groupedValue, recipes]) => ({
