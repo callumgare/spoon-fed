@@ -36,6 +36,7 @@ const settings = useSettingsStore();
 			to="/app"
 			class="ctaButton openApp"
 		/>
+		<NuxtLink to="/about">More info</NuxtLink>
 	</div>
 	
 </template>

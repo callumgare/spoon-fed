@@ -10,10 +10,6 @@ export default defineNuxtConfig({
 			path: "~/components",
 			pathPrefix: false,
 		},
-		{
-			path: "~/views",
-			pathPrefix: false,
-		},
 	],
 	imports: {
 		dirs: ["stores"],

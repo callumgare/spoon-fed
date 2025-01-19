@@ -1,6 +1,8 @@
 # Spoon Fed
 *The Low-Spoons Meal Planner*
 
+**Accessible at [spoonfed.cals.cafe](https://spoonfed.cals.cafe).**
+
 Spoon Fed is a little web app that allows you to sync your [Paprika](https://www.paprikaapp.com/) recipes and then pick some to receive a list of ingredients. Paprika is a fantastic app but I personally find the meal planing feature a little ridged for my tastes. Especially if I'm already feeling low on spoons I find myself quickly feeling overwhelming trying weekly meal planning when I have to pick breakfast, lunch and dinner for each day.
 
 To help with this I threw together Spoon Fed, which doesn't even give you the option to schedule in meals by the day. You simply pick a few meals you think might be good to eat that week. Once you've done a grocery shop for all the ingredients you can figure out which meals you want on a day-by-day basis.
@@ -17,7 +19,7 @@ Then setup the following required environment variables. If running locally then
 
 ## Environment Variables
   - **CACHE_URL** (or **CACHE_KV_URL**)\
-    To reduce load on Papika's servers, API requests are cached. CACHE_URL configures where they're cached. It can either be a local file path (e.g. `/tmp/spoon-fed/cache.json`) or a Redis connection string (e.g. `redis://user:pass@localhost:6379`).
+    To reduce load on Papika's servers, API requests are cached. CACHE_URL configures where they're cached. It can either be a local file path (e.g. `/tmp/spoon-fed/cache.json`) or a Redis connection string (e.g. `redis://user:pass@localhost:6379`). If none is given then an in-memory cache is used instead.
 
 ## Development Server
 
