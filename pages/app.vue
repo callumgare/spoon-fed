@@ -4,6 +4,12 @@ import RecipeResultsControls from "~/components/RecipeResultsControls.vue";
 const { recipes, status, total } = useRecipes();
 const settings = useSettingsStore();
 
+onMounted(async () => {
+	if (!settings.value.auth) {
+		await navigateTo("/login");
+	}
+});
+
 const { results } = useRecipeResults();
 
 function handleLogout() {
@@ -13,7 +19,7 @@ function handleLogout() {
 </script>
 
 <template>
-	<div class="MainView" key="MainView">
+	<div class="AppPage">
 		<nav class="site">
 			<SiteLogo size="small" />
 			<RecipesLoadingBar
@@ -49,7 +55,7 @@ function handleLogout() {
 </template>
 
 <style scoped>
-.MainView {
+.AppPage {
 	nav.site {
 		display: flex;
 		justify-content: space-between;

@@ -28,7 +28,7 @@ const submitHandler = async (event: FormSubmitEvent) => {
 				email: values.email,
 				auth: Paprika.getAuth(formValues),
 			};
-			await navigateTo("/");
+			await navigateTo("/app");
 		} else {
 			generalFormError.value = {
 				message: "Email and/or password is wrong",
