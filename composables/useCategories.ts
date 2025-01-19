@@ -1,10 +1,12 @@
-import { createGlobalState } from "@vueuse/core";
+import { createGlobalState, useLocalStorage } from "@vueuse/core";
 import type { Category } from "~/lib/paprika/types";
 
 export const useCategories = createGlobalState(() => {
 	const paprika = usePaprika();
 
-	const categories = ref<Category[]>([]);
+	const categories = useLocalStorage<Category[]>("categories", [], {
+		initOnMounted: true,
+	});
 	async function refreshCategories() {
 		if (paprika.value) {
 			categories.value = await paprika.value.categories();

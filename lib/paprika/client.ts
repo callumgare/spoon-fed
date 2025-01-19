@@ -49,10 +49,13 @@ export class Paprika {
 		// The hash query param isn't used by the actual paprika url, just our
 		// proxy so we know if the cached copy has expired or not
 		return await this.fetch<Recipe>(`recipe/${uid}?hash=${options.hash}`, {
-			cacheKey: options.hash,
+			// Ideally we could always cache this forever because of of the content hash included in the url which is
+			// in turn included in the cacheKey but photo_url isn't included in the hash calculation and changes on
+			// every request due to only being is only valid for 10 minutes. So if there's a photo_url we should only
+			// cache the recipe until the point that the url expires.
 			cacheTtl: options.hash
 				? (data) => getExpiresInFromUrl(data.photo_url)
-				: 0, // Ideally we could cache this forever because of hash as the cacheKey but photo_url isn't included in the hash calculation and changes on every request due to only being is only valid for 10 minutes,
+				: 0,
 			...options,
 		});
 	}
