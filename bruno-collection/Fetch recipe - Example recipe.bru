@@ -1,0 +1,11 @@
+meta {
+  name: Fetch recipe - Example recipe
+  type: http
+  seq: 2
+}
+
+get {
+  url: https://www.paprikaapp.com/api/v1/sync/recipe/{{uuid-for-example-recipe}}
+  body: none
+  auth: inherit
+}
