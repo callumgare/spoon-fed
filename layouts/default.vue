@@ -37,6 +37,32 @@ html {
   font-size: 14px;
   line-height: normal;
 	background-color: var(--p-content-background);
+	background-image: url("/background.svg");
+	/* Safari very annoyingly doesn't support prefers-color-scheme media query in
+	embedded SVGs so this is a workaround. See for more info:
+	https://bugs.webkit.org/show_bug.cgi?id=199134 */
+	@media (prefers-color-scheme: dark) {
+		background-image: url("/background-dark-mode-workaround.svg");
+	}
+	background-size: cover;
+	min-height: 100vh;
+	--p-tabs-tablist-background: transparent !important;
+	--p-tabs-tabpanel-background: transparent !important;
+	--p-fieldset-background: transparent !important;
+	--p-fieldset-legend-background: transparent !important;
+	
+}
+
+:root {
+	@media (prefers-color-scheme: light) {
+		--p-content-border-color: var(--p-surface-300);
+		color: var(--p-surface-800);
+	}
+	@media (prefers-color-scheme: dark) {
+		--p-text-muted-color: var(--p-surface-300);
+		color: var(--p-surface-100);
+		
+	}
 }
 
 /* Taken from https://css-tricks.com/inclusively-hidden/ */

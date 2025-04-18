@@ -89,6 +89,7 @@ function handleLogout() {
 			flex-wrap: wrap;
 			background: var(--p-tabs-tablist-background);
 			z-index: 1;
+			margin: 0 -8px 0; /* override body margin */
 
 			.options {
 				display: flex;
@@ -119,9 +120,15 @@ function handleLogout() {
 		}
 		.tabs {
 			.p-tablist {
+				position: fixed;
 				order: 2;
 				top: initial;
 				bottom: 0;
+				--p-tabs-tablist-background: var(--p-content-background) !important;
+				width: 100%;
+			}
+			.p-tabpanels {
+				margin-bottom: 3em;
 			}
 
 			:deep(.p-tablist-tab-list) {

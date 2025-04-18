@@ -38,7 +38,7 @@ const props = defineProps<{
       font-size: 1rem;
       color: var(--p-text-muted-color);
       border-style: solid;
-      border-color: var(--p-surface-200);
+      border-color: var(--p-content-border-color);
       border-width: 1px 0 1px 0;
       display: flex;
       align-items: center;

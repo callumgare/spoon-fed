@@ -32,6 +32,7 @@
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
 		"@primevue/nuxt-module": "^4.2.5",
-		"primeicons": "^7.0.0"
+		"primeicons": "^7.0.0",
+		"svgo": "^3.3.2"
 	}
 }
