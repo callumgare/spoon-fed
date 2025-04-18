@@ -21,6 +21,10 @@ const props = defineProps<{
 	line-height: initial;
   justify-content: center;
 
+  h1 {
+    font-family: "Chewy";
+  }
+
   &.small {
     flex-direction: row;
     gap: 1rem;

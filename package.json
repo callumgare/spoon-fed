@@ -15,6 +15,7 @@
 	},
 	"dependencies": {
 		"@keyv/redis": "^4.2.0",
+		"@nuxtjs/google-fonts": "^3.2.0",
 		"@primevue/forms": "^4.2.5",
 		"@primevue/themes": "^4.2.5",
 		"@vueuse/core": "^12.4.0",

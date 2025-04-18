@@ -15,10 +15,10 @@ const settings = useSettingsStore();
 				<li>Check the shopping list tab next time you're shopping to see the ingredients you'll need</li>
 			</ol>
 			<p>
-				Spoon Fed was designed especially with neurodivergent people in mind but it works for everyone! Paprika is a great app and it's built-in approach to meal planer might do exactly what you want. However if you find scheduling in meals for specific dates overwhelming or simply more detail than necessary then give Spoon Fed a try.
+				Paprika is a great app and its built-in meal planer might already do exactly what you want. However if its approach of requiring meals to be scheduled in on specific dates is something you find a little overwhelming (or just a greater level of detail than necessary) then give Spoon Fed a try.
 			</p>
 			<p>
-				Spoon Fed doesn't feature any scheduling, you simply pick which recipes you think you'd like to make then once you've bought the ingredients you'll have everything you need to make those recipes and you can decide what you want to make day-by-day.
+				With Spoon Fed you simply pick which recipes you'd like to make and use the generated shopping list to let you know what ingredients you need to pickup when you're at the shops. Then you can decide on a day-by-day basis what you'd like to make knowing you already have everything you need for each recipe.
 			</p>
 		</div>
 		<img src="/images/recipe-cards-screenshot.png" />
