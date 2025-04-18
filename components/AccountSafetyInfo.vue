@@ -25,7 +25,7 @@ const popupVisibility = ref();
     </Popover>
     <Dialog v-model:visible="popupVisibility" modal header="Account Security" class="accountSafety">
       <p>
-        Ideally your Paprika account details would be sent directly from your browser to Paprika's servers however since Paprika's API does not support <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS">CORS</a> this is not possible. Therefore Spoon Fed proxies the requests though it's own servers. Your credentials are forwarded on immediately to Paprika and are never stored. Please note however Spoon Fed does anonymously cache responses from Paprika's API both client-side and server-server for some amount of time in order to be a good API citizen by avoiding sending too many identical requests to Paprika's servers. 
+        Ideally your Paprika account details would be sent directly from your browser to Paprika's servers however since Paprika's API does not support <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS">CORS</a> this is not possible. Therefore Spoon Fed proxies the requests though it's own servers. Your credentials are forwarded on immediately to Paprika and never stored. Please note however Spoon Fed does cache anonymised responses from Paprika's API both on the client-side and server-side for some amount of time in order to be a good API citizen by avoiding sending too many identical requests to Paprika's servers. 
       </p>
       <p>
         Spoon Fed is a personal project built by <a href="callum.gare.au">Callum Gare</a> simply because they wanted such an app for their own use and there are no commercial interests. The entire project is open-source and <a :href="packageJson.repository">available on GitHub</a>.

@@ -35,6 +35,7 @@ const submitHandler = async (event: FormSubmitEvent) => {
 			};
 		}
 	} catch (error) {
+		console.error(error);
 		generalFormError.value = {
 			message: "An unknown error occurred. Sorry about that :(",
 		};
@@ -55,6 +56,7 @@ const resolver = zodResolver(formSchema);
 		<div class="fields">
 			<LoginFormField
 				name="email"
+				type="email"
 				icon-class="pi-at" 
 				label="Paprika Account Email Address"
 				:state="$form.email"
