@@ -31,6 +31,8 @@ export async function useProxiedPictureUrls(recipe: Recipe): Promise<Recipe> {
     )
   }
 
+  recipe.hash = `${recipe.hash}-with-cached-pictures`
+
   return recipe
 }
 

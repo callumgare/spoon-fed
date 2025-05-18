@@ -28,7 +28,7 @@ export function useCachedImages() {
     try {
       fileHandle = await getCachedImageFilename(imageUrl)
     } catch(error) {
-      if (!(error instanceof DOMException) || (error.name === "NotFoundError")) {
+      if (!(error instanceof DOMException) || (error.name !== "NotFoundError")) {
         // It's fine if we get NotFoundError, that just means the file is not cached
         // but if we get anything else that's a problem.
         logger.error(error)
