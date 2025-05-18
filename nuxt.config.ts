@@ -28,4 +28,9 @@ export default defineNuxtConfig({
 		},
 		text: "Spoon Fed",
 	},
+	routeRules: {
+		'/app': {
+			ssr: false
+		}
+	},
 });
