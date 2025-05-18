@@ -4,10 +4,22 @@ import type { Category } from "~/lib/paprika/types";
 export const useCategories = createGlobalState(() => {
 	const paprika = usePaprika();
 
+	let lastRefreshed: number | null = null
+
 	const categories = useLocalStorage<Category[]>("categories", [], {
 		initOnMounted: true,
 	});
 	async function refreshCategories() {
+		if (lastRefreshed && lastRefreshed > (Date.now() - (1000 * 15))) {
+			// If we previously refreshed in the last 15 seconds then don't bother refreshing again.
+			// When a recipe is loaded that includes a reference to a category that's not in the global
+			// list of categories the list of categories will be refreshed. However it's possible for 
+			// a recipe to contain a reference to a category that no longer exists meaning that it
+			// will always trigger a refresh even though the categories are already up to date. Limiting
+			// refreshing to every 15 seconds will stop this occurring too frequently.
+
+			return
+		}
 		if (paprika.value) {
 			categories.value = await paprika.value.categories();
 		} else {
@@ -15,6 +27,7 @@ export const useCategories = createGlobalState(() => {
 				"Attempted to refresh categories before paprika client has loaded.",
 			);
 		}
+		lastRefreshed = Date.now()
 	}
 
 	function getCategoryById(id: string): Category | null {

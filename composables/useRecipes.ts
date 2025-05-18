@@ -68,6 +68,9 @@ export const useRecipes = createGlobalState(() => {
 					for (const categoryId of recipe.categories) {
 						if (!getCategoryById(categoryId)) {
 							await refreshCategories();
+							if (!getCategoryById(categoryId)) {
+								logger.warn(`The recipe "${recipe.name}" (${recipe.uid}) includes an ID for a category that does not exist (${categoryId})`)
+							}
 						}
 					}
 					recipeQueue.push(recipe);
