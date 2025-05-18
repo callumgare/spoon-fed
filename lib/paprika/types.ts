@@ -13,10 +13,10 @@ export type Recipe = {
 	total_time: string;
 	source: string;
 	source_url: string;
-	image_url: string;
-	photo: string;
-	photo_hash: string;
-	photo_large: null;
+	image_url: string | null;
+	photo: string | null;
+	photo_hash: string | null;
+	photo_large: null | null;
 	scale: string;
 	hash: string;
 	categories: string[];

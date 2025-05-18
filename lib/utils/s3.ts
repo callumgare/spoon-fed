@@ -1,3 +1,7 @@
+/**
+ * @returns the number of milliseconds remaining until expiry (0 indicates it's already 
+ * expired) or undefined meaning the url does not indicate any expiry date
+ */
 export function getExpiresInFromUrl(url: string): number | undefined {
 	if (!url) {
 		return undefined;
@@ -14,10 +18,7 @@ export function getExpiresInFromUrl(url: string): number | undefined {
 			return undefined;
 		}
 		const expiresIn = expiryTimestampInSeconds * 1000 - Date.now();
-		if (expiresIn >= 0) {
-			return expiresIn;
-		}
-		return undefined;
+		return Math.max(expiresIn, 0);
 	} catch (error) {
 		return undefined;
 	}

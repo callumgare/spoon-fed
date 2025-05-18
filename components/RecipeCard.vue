@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useCycleList } from "@vueuse/core";
 import type { Recipe } from "~/lib/paprika/types";
 
 const props = defineProps<{
@@ -9,14 +8,31 @@ const props = defineProps<{
 const recipeId = computed(() => props.recipe?.uid || "");
 const selectionQty = useRecipeSelectionQty(recipeId);
 const imageSrcFallback = "/images/fork.svg";
-const listOfImageSrcs = computed(() => [
+const pictureUrls = computed(() => [
 	...(props.recipe?.photo_url ? [props.recipe?.photo_url] : []),
 	...(props.recipe?.image_url ? [props.recipe?.image_url] : []),
-	imageSrcFallback,
 ]);
 
-const { state: imageSrc, next, go } = useCycleList(listOfImageSrcs);
-watch(listOfImageSrcs, () => go(0));
+const paprika = usePaprika()
+
+const imageSrc = ref()
+const {getCachedImage} = useCachedImages()
+
+watch(pictureUrls, async () => {
+  const headers = paprika.value?.getHeaders()
+  for (const imageUrl of pictureUrls.value) {
+    try {
+      const file = await getCachedImage(imageUrl, headers)
+      imageSrc.value = URL.createObjectURL(file)
+    } catch(error) {
+      logger.error(`Failed to load picture ${imageUrl}`)
+      continue
+    }
+    return;
+  }
+  imageSrc.value = imageSrcFallback
+}, { immediate: true });
+
 </script>
 
 <template>
@@ -27,11 +43,12 @@ watch(listOfImageSrcs, () => go(0));
   >
     <template #header>
       <img
+        v-if="imageSrc"
         alt=""
         :src="imageSrc"
         :class="{fallback: imageSrc === imageSrcFallback}"
-        @error="next()"
       />
+      <Skeleton v-else height="min(15rem, 40vw)"></Skeleton>
     </template>
     <template #title>
       {{recipe.name}}
@@ -44,7 +61,7 @@ watch(listOfImageSrcs, () => go(0));
   </Card>
   <Card v-else>
     <template #header>
-      <Skeleton height="150px"></Skeleton>
+      <Skeleton height="min(15rem, 40vw)"></Skeleton>
     </template>
     <template #title>
       <Skeleton height="1.5rem"></Skeleton>
@@ -80,8 +97,6 @@ watch(listOfImageSrcs, () => go(0));
   }
   .p-skeleton {
     height: 5rem;
-  }
-  .p-card-header {
   }
 }
 </style>

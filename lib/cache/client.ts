@@ -1,6 +1,7 @@
 import Keyv, { type KeyvOptions } from "keyv";
 import type { Promisable } from "type-fest";
 
+// number is in milliseconds
 export type CacheTtlParam<T> =
 	| number
 	| undefined
@@ -83,12 +84,6 @@ export class Cache {
 			const options: KeyvOptions = {};
 			if (!cacheUrl) {
 				// CACHE_URL not set so only a memory cache is used
-			} else if (cacheUrl.startsWith("/")) {
-				const { KeyvFile } = await import("keyv-file");
-				options.store = new KeyvFile({
-					filename: cacheUrl,
-					writeDelay: 100,
-				});
 			} else if (
 				cacheUrl.startsWith("redis://") ||
 				cacheUrl.startsWith("rediss://")
@@ -96,7 +91,11 @@ export class Cache {
 				const { default: KeyvRedis } = await import("@keyv/redis");
 				options.store = new KeyvRedis(cacheUrl);
 			} else {
-				throw Error(`CACHE_URL is invalid: ${cacheUrl}`);
+				const { KeyvFile } = await import("keyv-file");
+				options.store = new KeyvFile({
+					filename: cacheUrl,
+					writeDelay: 100,
+				});
 			}
 			this.keyv = new Keyv(options);
 		}

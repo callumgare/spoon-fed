@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { useProxiedPictureUrls } from "~/lib/picture-proxy";
 import {
 	createPaprikaResponse,
 	getPaprikaClient,
@@ -19,6 +20,8 @@ export default defineEventHandler(async (event) => {
 			}).parse,
 		);
 		const paprika = getPaprikaClient(event);
-		return paprika.recipe(uid, { hash });
+		let recipe = await paprika.recipe(uid, { hash });
+		recipe = await useProxiedPictureUrls(recipe)
+		return recipe
 	});
 });

@@ -102,10 +102,7 @@ export class Paprika {
 				if (this.rateLimiter) {
 					await this.rateLimiter.waitTillReadyForNext();
 				}
-				const headers = {
-					Authorization: `Basic ${this.auth}`,
-					"User-Agent": `spoon-fed (see ${packageJson.repository} for more info and contact ${packageJson.author} if there are any issues)`,
-				};
+				const headers = this.getHeaders();
 				const res = await fetch(
 					`${this.rootUrl.replace(/\/+#/, "")}/${endpointPath}`,
 					{ headers },
@@ -121,5 +118,12 @@ export class Paprika {
 			},
 			{ cacheTtl: "cacheTtl" in options ? options.cacheTtl : 0 },
 		);
+	}
+
+	getHeaders() {
+		return {
+			Authorization: `Basic ${this.auth}`,
+			"User-Agent": `spoon-fed (see ${packageJson.repository} for more info and contact ${packageJson.author} if there are any issues)`,
+		}
 	}
 }
