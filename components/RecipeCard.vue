@@ -53,11 +53,6 @@ watch(pictureUrls, async () => {
     <template #title>
       {{recipe.name}}
     </template>
-    <template #content v-if="recipe?.description">
-      <p class="m-0">
-        {{ recipe.description }}
-      </p>
-    </template>
   </Card>
   <Card v-else>
     <template #header>
