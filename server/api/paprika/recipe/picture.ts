@@ -1,7 +1,7 @@
-import { getPaprikaClient } from "~/lib/server-routes/utils";
+import { createPaprikaResponse, getPaprikaClient } from "~/lib/server-routes/utils";
 import { getUpstreamPictureUrl } from "~/lib/picture-proxy";
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (event) => createPaprikaResponse(async () => {
 	const url = getRequestURL(event)
 	const paprika = getPaprikaClient(event);
 	const upstreamPictureUrl = await getUpstreamPictureUrl(url.href, paprika)
@@ -9,9 +9,10 @@ export default defineEventHandler(async (event) => {
 		return new Error("Picture could not be retrieved")
 	}
 	try {
-		return await sendProxy(event, upstreamPictureUrl);
+    setHeader(event, 'Cache-Control', 'public, max-age=31536000, immutable')
+		return await sendProxy(event, upstreamPictureUrl)
 	} catch (error) {
 		logger.error(`Failed to load: ${upstreamPictureUrl}`);
 		return new Error("Error when fetching picture")
 	}
-});
+}));

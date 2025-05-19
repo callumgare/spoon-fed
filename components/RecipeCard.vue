@@ -16,16 +16,22 @@ const pictureUrls = computed(() => [
 const paprika = usePaprika()
 
 const imageSrc = ref()
-const {getCachedImage} = useCachedImages()
 
 watch(pictureUrls, async () => {
   const headers = paprika.value?.getHeaders()
   for (const imageUrl of pictureUrls.value) {
     try {
-      const file = await getCachedImage(imageUrl, headers)
-      imageSrc.value = URL.createObjectURL(file)
+      const response = await fetch(imageUrl, {headers});
+
+      if (!response.ok) {
+        throw new Error(`Non-successful status code received when fetching picture: ${response.status}`);
+      }
+
+      const imageBlob = await response.blob();
+      imageSrc.value = URL.createObjectURL(imageBlob)
     } catch(error) {
-      logger.error(`Failed to load picture ${imageUrl}`)
+      logger.info(`The following error occurred when loading: ${imageUrl}`)
+      logger.error(error)
       continue
     }
     return;

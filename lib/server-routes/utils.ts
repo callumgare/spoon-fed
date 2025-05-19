@@ -1,6 +1,7 @@
 import type { EventHandlerRequest, H3Event } from "h3";
 import { Paprika } from "../paprika/client";
 import { PaprikaApiInvalidLoginDetailsError } from "../paprika/errors";
+import { ServerResponse } from 'node:http';
 
 // We cache client objects rather than creating them on every request since
 // each object instantiates a Cache() object which might have it's own in-memory
@@ -25,6 +26,11 @@ export function getPaprikaClient(event: H3Event<EventHandlerRequest>) {
 
 export async function createPaprikaResponse(getRes: () => Promise<unknown>) {
 	try {
+		const response = await getRes()
+		if (response instanceof ServerResponse) {
+			return response
+		}
+		
 		return {
 			result: await getRes(),
 		};

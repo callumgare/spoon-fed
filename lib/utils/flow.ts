@@ -16,6 +16,9 @@ export const asyncRatelimit = async function* <T>(
 export class RateLimiter {
 	private rate: number;
 	private promiseChain: Promise<unknown> | undefined;
+	/**
+	 * @param rate in milliseconds
+	 */
 	constructor(rate: number) {
 		this.rate = rate;
 	}
