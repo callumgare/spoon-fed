@@ -92,7 +92,16 @@ export class Paprika {
 		options: EndpointSharedOptions<T> = {},
 	): Promise<T> {
 		if (!this.userHash) {
-			this.userHash = await hashString(this.auth);
+			// Required crypto function not available in non-https context so fall back to
+			// just using base32 hashed auth string to not break local development
+			if (
+				typeof window !== "undefined" &&
+				window.location.protocol !== "https:"
+			) {
+				this.userHash = this.auth;
+			} else {
+				this.userHash = await hashString(this.auth);
+			}
 		}
 		const { cacheKey } = options;
 		const fullCacheKey = `paprika:${this.userHash}:${endpointPath}${cacheKey ? `:${cacheKey}` : ""}`;
