@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import usePageHeightCSS from '~/composables/usePageHeightCSS';
+
 useHead({
 	title: "Spoon Fed",
 	meta: [
@@ -25,6 +27,8 @@ useHead({
 		{ rel: "manifest", href: "/site.webmanifest" },
 	],
 });
+
+usePageHeightCSS()
 </script>
 <template>
   <slot />
@@ -36,16 +40,32 @@ html {
   font-family: Inter var, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
   font-size: 14px;
   line-height: normal;
-	background-color: var(--p-content-background);
-	background-image: url("/background.svg");
-	/* Safari very annoyingly doesn't support prefers-color-scheme media query in
-	embedded SVGs so this is a workaround. See for more info:
-	https://bugs.webkit.org/show_bug.cgi?id=199134 */
+
+	--brand-color-1: #F6F7D4;
+	--brand-color-2: #D2F6C5;
+	--brand-color-3: #99F3BD;
+	--brand-color-4: #28df99;
+	
+	--page-background-transparency: 80%;
+	--page-background-tint: white;
 	@media (prefers-color-scheme: dark) {
-		background-image: url("/background-dark-mode-workaround.svg");
+		--page-background-transparency: 60%;
+		--page-background-tint: black;
 	}
-	background-size: cover;
+	--page-background: 
+		linear-gradient(
+			134deg,
+			color-mix(in hsl, var(--brand-color-1), transparent var(--page-background-transparency)) 0%, 
+			color-mix(in hsl, var(--brand-color-2), transparent var(--page-background-transparency)) 33%, 
+			color-mix(in hsl, var(--brand-color-3), transparent var(--page-background-transparency)) 66%, 
+			color-mix(in hsl, var(--brand-color-4), transparent var(--page-background-transparency)) 100%
+		),
+		var(--page-background-tint);
+	background-color: var(--p-content-background);
+	background: var(--page-background);
+	
 	min-height: 100vh;
+
 	--p-tabs-tablist-background: transparent !important;
 	--p-tabs-tabpanel-background: transparent !important;
 	--p-fieldset-background: transparent !important;

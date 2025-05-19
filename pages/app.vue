@@ -114,6 +114,17 @@ function handleLogout() {
   		font-size: 2rem;
 		}
 	}
+	@media (min-width: 499px) {
+		nav.site {
+			justify-content: center;
+		}
+		.tabs {
+			.p-tablist {
+				background: var(--page-background);
+				background-size: 100vw var(--page-height);
+			}
+		}
+	}
 	@media (max-width: 500px) {
 		nav.site {
 			justify-content: center;
