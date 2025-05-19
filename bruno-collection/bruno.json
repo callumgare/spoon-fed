@@ -1,9 +1,11 @@
 {
-  "version": "1",
-  "name": "Paprika - Spoon Fed",
-  "type": "collection",
-  "ignore": [
-    "node_modules",
-    ".git"
-  ]
+	"version": "1",
+	"name": "Paprika - Spoon Fed",
+	"type": "collection",
+	"ignore": ["node_modules", ".git"],
+  "scripts": {
+    "filesystemAccess": {
+      "allow": true
+    }
+  }
 }

@@ -1,0 +1,11 @@
+meta {
+  name: Fetch recipes
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{api-base-url}}/recipes
+  body: none
+  auth: inherit
+}

@@ -1,0 +1,27 @@
+meta {
+  name: Add/update menu
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{api-base-url}}/menus
+  body: multipartForm
+  auth: inherit
+}
+
+body:multipart-form {
+  data: '''
+    SCRIPT GZIPS THIS:
+    [
+      {
+        "name": "Example Menu",
+        "days": 1,
+        "deleted": false,
+        "order_flag": 999,
+        "uid": {{example-menu-uuid}},
+        "notes": "Modified using Bruno"
+      }
+    ]
+  '''
+}

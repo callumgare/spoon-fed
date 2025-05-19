@@ -1,0 +1,15 @@
+meta {
+  name: Fetch recipe - Example recipe
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{api-base-url}}/recipe/{{example-recipe-uuid}}?hash=fake-hash
+  body: none
+  auth: inherit
+}
+
+params:query {
+  hash: fake-hash
+}
