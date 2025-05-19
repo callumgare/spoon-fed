@@ -63,14 +63,24 @@ export class Cache {
 		return await keyv.delete(key);
 	}
 	async memo<T>(
-		key: string,
+		keys: string | string[],
 		getSource: () => Promisable<T>,
-		{ cacheTtl }: { cacheTtl?: CacheTtlParam<T> } = {},
+		{ cacheTtl, additionalCacheSetKeys }: { cacheTtl?: CacheTtlParam<T>, additionalCacheSetKeys?: string[] } = {},
 	): Promise<T> {
-		let result = await this.get(key);
+		let result: T | undefined = undefined
+		const cacheGetKeys = Array.isArray(keys) ? keys : [keys]
+		for (const key of cacheGetKeys) {
+			result = await this.get(key);
+			if (result !== undefined) {
+				break;
+			}
+		}
 		if (!result) {
 			result = await getSource();
-			await this.set(key, result, { cacheTtl });
+			const cacheSetKeys = [...cacheGetKeys, ...(additionalCacheSetKeys ?? [])]
+			for (const key of cacheSetKeys) {
+				await this.set(key, result, { cacheTtl });
+			}
 		}
 		return result;
 	}

@@ -2,7 +2,7 @@ import packageJson from "../../package.json";
 import { Cache, type CacheTtlParam } from "../cache/client";
 import { RateLimiter } from "../utils/flow";
 import { getExpiresInFromUrl } from "../utils/s3";
-import { hashString } from "../utils/security";
+import { hash } from "ohash";
 import { PaprikaApiError, PaprikaApiInvalidLoginDetailsError } from "./errors";
 import type {
 	Category,
@@ -20,6 +20,7 @@ type ConstructorProps = {
 type EndpointSharedOptions<T> = {
 	cacheTtl?: CacheTtlParam<T>;
 	cacheKey?: string;
+	additionalCacheSetKeys?: string[],
 };
 
 export class Paprika {
@@ -45,18 +46,21 @@ export class Paprika {
 
 	async recipe(
 		uid: string,
-		options: EndpointSharedOptions<Recipe> & { hash?: string },
+		options: EndpointSharedOptions<Recipe> & { hash?: string } = {},
 	) {
 		// The hash query param isn't used by the actual paprika url, just our
 		// proxy so we know if the cached copy has expired or not
-		return await this.fetch<Recipe>(`recipe/${uid}?hash=${options.hash}`, {
+		return await this.fetch<Recipe>(`recipe/${uid}?hash=${options.hash ?? ""}`, {
 			// Ideally we could always cache this forever because of of the content hash included in the url which is
 			// in turn included in the cacheKey but photo_url isn't included in the hash calculation and changes on
-			// every request due to only being is only valid for 10 minutes. So if there's a photo_url we should only
-			// cache the recipe until the point that the url expires.
+			// every request due to only being is only valid for 10 minutes.
 			cacheTtl: options.hash
-				? (data) => getExpiresInFromUrl(data.photo_url)
-				: 0,
+				// If we have the recipe hash then cache till photo_url expires or in an hour if no expiry
+				? (data) => getExpiresInFromUrl(data.photo_url) ?? 1000 * 60 * 60
+				// Otherwise cache for a minute
+				: 1000 * 60,
+			cacheKey: `recipe/${uid}:${options.hash || "latest"}`,
+			additionalCacheSetKeys: options.hash !== "latest" ? [`recipe/${uid}:${"latest"}`] : undefined,
 			...options,
 		});
 	}
@@ -92,24 +96,21 @@ export class Paprika {
 		options: EndpointSharedOptions<T> = {},
 	): Promise<T> {
 		if (!this.userHash) {
-			// Required crypto function not available in non-https context so fall back to
-			// just using base32 hashed auth string to not break local development
-			if (
-				typeof window !== "undefined" &&
-				window.location.protocol !== "https:"
-			) {
-				this.userHash = this.auth;
-			} else {
-				this.userHash = await hashString(this.auth);
-			}
+			this.userHash = await hash(this.auth);
 		}
-		const { cacheKey } = options;
-		const fullCacheKey = `paprika:${this.userHash}:${endpointPath}${cacheKey ? `:${cacheKey}` : ""}`;
+		const { cacheKey, additionalCacheSetKeys } = options;
+		const fullCacheKey = `paprika:${this.userHash}:${cacheKey ? cacheKey : endpointPath}`;
+		const fullAdditionalCacheSetKeys = additionalCacheSetKeys?.map(additionalCacheSetKey => `paprika:${this.userHash}:${additionalCacheSetKey}`);
 		return this.cache.memo(
 			fullCacheKey,
 			async () => {
 				if (this.rateLimiter) {
 					await this.rateLimiter.waitTillReadyForNext();
+				}
+				logger.info(`Sending request to paprika: ${endpointPath}`)
+				logger.info(`Cache key: ${fullCacheKey}`)
+				if (fullAdditionalCacheSetKeys) {
+					logger.info(`Additional cache set keys: ${fullAdditionalCacheSetKeys.join(', ')}`)
 				}
 				const headers = this.getHeaders();
 				const res = await fetch(
@@ -125,7 +126,10 @@ export class Paprika {
 				const resBody: { result: T } = await res.json();
 				return resBody.result;
 			},
-			{ cacheTtl: "cacheTtl" in options ? options.cacheTtl : 0 },
+			{ 
+				cacheTtl: "cacheTtl" in options ? options.cacheTtl : 0,
+				additionalCacheSetKeys: fullAdditionalCacheSetKeys
+			},
 		);
 	}
 

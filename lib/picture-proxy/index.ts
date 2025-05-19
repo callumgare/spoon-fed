@@ -1,3 +1,4 @@
+import { hash } from "ohash";
 import { Cache } from "../cache/client";
 import type { Paprika } from "../paprika/client";
 import type { Recipe } from "../paprika/types";
@@ -7,33 +8,32 @@ import { pictureDetailsSchema, type PictureDetails } from "./types";
 const recipePictureMap = new Cache();
 
 export async function useProxiedPictureUrls(recipe: Recipe): Promise<Recipe> {
-  if (recipe.image_url) {
-    recipe.image_url = await cachePictureUrl(
-      recipe.image_url,
+  const modifiedRecipe = {...recipe}
+  if (modifiedRecipe.image_url) {
+    modifiedRecipe.image_url = await cachePictureUrl(
+      modifiedRecipe.image_url,
       {
-        recipeId: recipe.uid,
-        recipeHash: recipe.hash,
+        recipeId: modifiedRecipe.uid,
         pictureType: "image",
-        pictureHash: "",
+        pictureHash: hash(modifiedRecipe.image_url),
       }
     )
   }
 
-  if (recipe.photo_url) {
-    recipe.photo_url = await cachePictureUrl(
-      recipe.photo_url,
+  if (modifiedRecipe.photo_url) {
+    modifiedRecipe.photo_url = await cachePictureUrl(
+      modifiedRecipe.photo_url,
       {
-        recipeId: recipe.uid,
-        recipeHash: recipe.hash,
+        recipeId: modifiedRecipe.uid,
         pictureType: "photo",
-        pictureHash: recipe.photo_hash ?? "",
+        pictureHash: modifiedRecipe.photo_hash ?? modifiedRecipe.hash,
       }
     )
   }
 
-  recipe.hash = `${recipe.hash}-with-cached-pictures`
+  modifiedRecipe.hash = `${modifiedRecipe.hash}-with-cached-pictures`
 
-  return recipe
+  return modifiedRecipe
 }
 
 async function cachePictureUrl(pictureUrl: string, pictureDetails: PictureDetails): Promise<string> {
@@ -43,7 +43,7 @@ async function cachePictureUrl(pictureUrl: string, pictureDetails: PictureDetail
     cacheTtl = urlExpiresIn - (1000 * 5) // If the url indicates an expiry then use that minus 5 seconds
   }
   const pictureKey = pictureDetailsToKey(pictureDetails)
-  logger.info(`Setting ${pictureDetails.pictureType} for ${pictureDetails.recipeId} to ${pictureUrl} with a TTL of ${cacheTtl/1000} seconds`)
+  logger.info(`Setting ${pictureDetails.pictureType} for ${pictureDetails.recipeId} to ${pictureUrl} with a TTL of ${cacheTtl/1000} seconds using the key ${pictureKey}`)
   await recipePictureMap.set(pictureKey, pictureUrl, {cacheTtl})
   return pictureDetailsToUrl(pictureDetails)
 }
@@ -54,15 +54,21 @@ export async function getUpstreamPictureUrl(spoonFeedPictureUrl: string, paprika
 
   let upstreamPictureUrl = await recipePictureMap.get(pictureKey)
   if (!upstreamPictureUrl) {
-    logger.info(`The ${pictureDetails.pictureType} url for recipe ${pictureDetails.recipeId} is not cached, fetching the recipe to get the url`)
-    const recipe = await paprika.recipe(pictureDetails.recipeId, { hash: pictureDetails.recipeHash });
+    logger.info(`The ${pictureDetails.pictureType} url for recipe ${pictureDetails.recipeId} with cache key ${pictureKey} is not cached, fetching the recipe to get the url`)
+    const recipe = await paprika.recipe(pictureDetails.recipeId);
     // Call useProxiedPictureUrls() to save any picture urls into the map
     await useProxiedPictureUrls(recipe)
-    upstreamPictureUrl = await recipePictureMap.get(pictureKey)
+    if (pictureDetails.pictureType === "image") {
+      upstreamPictureUrl = recipe.image_url
+    } else if (pictureDetails.pictureType === "photo") {
+      upstreamPictureUrl = recipe.photo_url
+    } else {
+      pictureDetails.pictureType satisfies never
+    }
     if (!upstreamPictureUrl) {
       logger.info("Recipe:")
       logger.info(recipe)
-      logger.error(`Failed to retrieve ${pictureDetails.pictureType} from original recipe ${recipe.uid}`)
+      logger.error(`Failed to retrieve ${pictureDetails.pictureType} from original recipe ${recipe.uid} using key ${pictureKey}`)
     }
   }
 
@@ -90,7 +96,7 @@ function urlToPictureDetails(pictureUrl: string): PictureDetails {
 }
 
 function pictureDetailsToKey(pictureDetails: PictureDetails): string {
-  const {recipeId, recipeHash, pictureType, pictureHash } = pictureDetails
-  return `${recipeId}:${recipeHash}:${pictureType}:${pictureHash}`
+  const {recipeId, pictureType, pictureHash } = pictureDetails
+  return `${recipeId}:${pictureType}:${pictureHash}`
 
 }

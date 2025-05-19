@@ -5,14 +5,13 @@ meta {
 }
 
 get {
-  url: {{api-base-url}}/recipe/picture?recipeId={{example-recipe-uuid}}&recipeHash=fake-hash&pictureType=photo&pictureHash
+  url: {{api-base-url}}/recipe/picture?recipeId={{example-recipe-uuid}}&pictureType=photo&pictureHash
   body: none
   auth: inherit
 }
 
 params:query {
   recipeId: {{example-recipe-uuid}}
-  recipeHash: fake-hash
   pictureType: photo
   pictureHash: 
 }

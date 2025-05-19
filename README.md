@@ -60,3 +60,7 @@ Logo based on the spoon and frame doodle drawings from [Khushmeen Sidhu's Doodle
   - Group by supermarket aisle
 - Maybe provide an option to use without Paprika by allowing users to sign-up for local accounts and save their recipes directly in Spoon Fed, emulating the Paprika API to use the recipes.
 - Update to work offline
+
+## Architecture Choices
+### Server-side Image Handling
+Paprika's API will generally provide an image via an s3 URL. That URL expires after a short period of time and the response does not include CORS headers. This makes it difficult for us to have the browser fetch the image directly and have the browser cache the image effectively. To work around this the browser instead requests the image from the Spoon Fed backend which in turn requests it from s3 and serves it to the browser.

@@ -30,6 +30,9 @@ export async function createPaprikaResponse(getRes: () => Promise<unknown>) {
 		if (response instanceof ServerResponse) {
 			return response
 		}
+		if (response instanceof Error) {
+			throw response
+		}
 		
 		return {
 			result: await getRes(),
