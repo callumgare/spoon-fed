@@ -21,5 +21,6 @@ if (settings.value.auth) {
 	align-items: center;
 	min-height: 80vh;
 	gap: 3rem;
+	margin: 2rem;
 }
 </style>

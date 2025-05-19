@@ -29,5 +29,6 @@ import packageJson from "../package.json";
 	margin: auto;
 	line-height: 1.5;
 	font-size: 1.1rem;
+	margin: 2rem;
 }
 </style>

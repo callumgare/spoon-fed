@@ -57,6 +57,9 @@ function handleLogout() {
 
 <style scoped>
 .AppPage {
+	--page-margin: 1rem;
+	margin: var(--page-margin);
+
 	nav.site {
 		display: flex;
 		justify-content: space-between;
@@ -89,7 +92,7 @@ function handleLogout() {
 			flex-wrap: wrap;
 			background: var(--p-tabs-tablist-background);
 			z-index: 1;
-			margin: 0 -8px 0; /* override body margin */
+			margin: 0 calc(var(--page-margin) * -1) 0; /* override body margin */
 
 			.options {
 				display: flex;

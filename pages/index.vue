@@ -49,7 +49,7 @@ const settings = useSettingsStore();
 	align-items: safe center;
 	min-height: 80vh;
 	gap: 4rem;
-	margin-bottom: 4rem;
+	margin: 2rem 2rem 4rem;
 
 	font-size: 1.2rem;
 	line-height: 1.8rem;

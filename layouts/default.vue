@@ -73,6 +73,10 @@ html {
 	
 }
 
+body {
+	margin: 0;
+}
+
 :root {
 	@media (prefers-color-scheme: light) {
 		--p-content-border-color: var(--p-surface-300);
