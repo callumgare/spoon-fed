@@ -40,9 +40,9 @@ function handleLogout() {
 			<TabPanels>
 				<TabPanel value="recipes">
 					<RecipeResultsControls />
-					<div v-for="recipeGroup in results">
+					<div v-for="recipeGroup in results" :class="{noGroup: !recipeGroup.groupedValue}">
 						<h3 v-if="results.length !== 1 || recipeGroup.groupedValue">
-							{{ recipeGroup.groupedValue || "No Group Value" }}
+							{{ recipeGroup.groupedValue || "No Group" }}
 						</h3>
 						<RecipesSelector :recipes="recipeGroup.recipes" />
 					</div>
@@ -115,6 +115,12 @@ function handleLogout() {
 		h3 {
 			text-align: center;
   		font-size: 2rem;
+		}
+
+		.noGroup {
+			h3 {
+				color: var(--p-text-muted-color);
+			}
 		}
 	}
 	@media (min-width: 499px) {

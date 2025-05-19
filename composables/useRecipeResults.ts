@@ -95,7 +95,7 @@ function recipePropSortCompare(a: unknown, b: unknown, groupBy: GroupBy) {
 		const getSortValue = (value: string) =>
 			difficultySortOrder.indexOf(value.toLocaleLowerCase()) !== -1
 				? difficultySortOrder.indexOf(value.toLocaleLowerCase())
-				: difficultySortOrder.length;
+				: difficultySortOrder.length + (!value ? 1 : 0); // An empty/undefined group value should be sorted below an unknown one
 		return getSortValue(a) - getSortValue(b);
 	}
 	groupBy satisfies never;
