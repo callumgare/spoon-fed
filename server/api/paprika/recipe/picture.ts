@@ -10,6 +10,7 @@ export default defineEventHandler(async (event) => createPaprikaResponse(async (
 	}
 	try {
     setHeader(event, 'Cache-Control', 'public, max-age=31536000, immutable')
+		setHeader(event, 'Vary', 'Authorization')
 		return await sendProxy(event, upstreamPictureUrl)
 	} catch (error) {
 		logger.error(`Failed to load: ${upstreamPictureUrl}`);
