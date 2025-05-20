@@ -146,9 +146,14 @@ function handleLogout() {
 				bottom: 0;
 				--p-tabs-tablist-background: var(--p-content-background) !important;
 				width: 100%;
+
+				.p-tab {
+					padding-bottom: 1.5rem;
+				}
 			}
 			.p-tabpanels {
 				margin-bottom: 3em;
+				padding: 0;
 			}
 
 			:deep(.p-tablist-tab-list) {

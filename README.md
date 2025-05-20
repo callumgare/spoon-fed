@@ -49,7 +49,6 @@ npm run start
 Logo based on the spoon and frame doodle drawings from [Khushmeen Sidhu's Doodle icons set](https://khushmeen.com/icons.html). The placeholder image used for recipes without an image or that have a broken image is the [Knife and Fork Twitter Emoji icon](https://iconscout.com/free-icon/fork-and-knife-cooking-kitchen-emoj-symbol).
 
 ## Future plans (no promises though)
-- On sync set a recipe's selection status based on if "is_pinned" is true and whenever a recipe is selected/deselected toggle a recipes "is_pinned" status. This would effective allow syncing of selection status between devices + it would have the added bonus of marking selected recipes as pinned in the sidebar of Paprika.
 - Add a collapsible section to the shopping list view that displays the number of recipes selected when collapsed and when open lists those recipes along with an option to unselect. (Maybe also an eye open/closed icon for temporarily toggling the inclusion of ingredients for the given recipe.)
 - Add a similar collapsible section to the recipe selection page that shows any recipes that are hidden due to the current filter.
 - Add sorting option to recipe view.
