@@ -42,6 +42,11 @@ export const useRecipes = createGlobalState(() => {
 			null,
 		),
 	]);
+
+	function getRecipe(recipeId: string) {
+		return recipes.value.find(recipe => recipe.uid === recipeId)
+	}
+
 	watch(recipesIndex.data, async () => {
 		// If we have a lot of recipes already in cache then we're going to add them to "recipes" at a very high rate
 		// which will cause any computed refs and watches to do a bunch of calculation that will just be immediately
@@ -88,6 +93,7 @@ export const useRecipes = createGlobalState(() => {
 	return {
 		recipes,
 		recipesWithLoading,
+		getRecipe,
 		status,
 		error,
 		total,

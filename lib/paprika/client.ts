@@ -10,7 +10,12 @@ import type {
 	Recipe,
 	RecipeIndexItem,
 	Status,
+	Menu,
+	MenuItem,
+	UpsertMenu,
+	UpsertMenuItem,
 } from "./types";
+import { compressTextWithGzip } from "../utils/compression";
 
 type ConstructorProps = {
 	rootUrl?: string;
@@ -69,6 +74,22 @@ export class Paprika {
 		return await this.fetch<Category[]>("categories", options);
 	}
 
+	async menus(options: EndpointSharedOptions<Menu[]> = {}) {
+		return await this.fetch<Menu[]>("menus", options);
+	}
+
+	async upsertMenus(menus: UpsertMenu[], options: EndpointSharedOptions<void> = {}) {
+		return await this.fetch<void, UpsertMenu[]>("menus", {...options, gzippedDataPayload: menus});
+	}
+
+	async menuItems(options: EndpointSharedOptions<MenuItem[]> = {}) {
+		return await this.fetch<MenuItem[]>("menuitems", options);
+	}
+
+	async upsertMenuItems(menuItems: UpsertMenuItem[], options: EndpointSharedOptions<void> = {}) {
+		return await this.fetch<void, UpsertMenuItem[]>("menuitems", {...options, gzippedDataPayload: menuItems});
+	}
+
 	async status(options: EndpointSharedOptions<Status[]> = {}) {
 		return await this.fetch<Status[]>("status", options);
 	}
@@ -91,46 +112,77 @@ export class Paprika {
 			: btoa(`${loginDetails.email}:${loginDetails.password}`);
 	}
 
-	private async fetch<T>(
+	private async fetch<ResponseData, RequestData = ResponseData>(
 		endpointPath: string,
-		options: EndpointSharedOptions<T> = {},
-	): Promise<T> {
+		options: EndpointSharedOptions<ResponseData> & {
+			requestOptions?: RequestInit,
+			gzippedDataPayload?: RequestData
+		} = {},
+	): Promise<ResponseData> {
 		if (!this.userHash) {
 			this.userHash = await hash(this.auth);
 		}
 		const { cacheKey, additionalCacheSetKeys } = options;
 		const fullCacheKey = `paprika:${this.userHash}:${cacheKey ? cacheKey : endpointPath}`;
 		const fullAdditionalCacheSetKeys = additionalCacheSetKeys?.map(additionalCacheSetKey => `paprika:${this.userHash}:${additionalCacheSetKey}`);
-		return this.cache.memo(
-			fullCacheKey,
-			async () => {
-				if (this.rateLimiter) {
-					await this.rateLimiter.waitTillReadyForNext();
+		const sendUpstream = async () => {
+			if (this.rateLimiter) {
+				await this.rateLimiter.waitTillReadyForNext();
+			}
+			logger.info(`Sending request to paprika: ${endpointPath}`)
+			if (options.gzippedDataPayload) {
+				logger.info(`Payload: ${JSON.stringify(options.gzippedDataPayload, null, 2)}`)
+			}
+			const requestOptions = {
+				...options?.requestOptions,
+				headers: {
+					...this.getHeaders(),
+					...options?.requestOptions?.headers,
 				}
-				logger.info(`Sending request to paprika: ${endpointPath}`)
-				logger.info(`Cache key: ${fullCacheKey}`)
-				if (fullAdditionalCacheSetKeys) {
-					logger.info(`Additional cache set keys: ${fullAdditionalCacheSetKeys.join(', ')}`)
+			}
+			if (options.gzippedDataPayload) {
+				const gzipBlob = await compressTextWithGzip(JSON.stringify(options.gzippedDataPayload))
+				const formData = new FormData();
+				formData.append('data', gzipBlob, 'file');
+				requestOptions.body = formData
+				if (!requestOptions.method) {
+					requestOptions.method = "POST"
 				}
-				const headers = this.getHeaders();
-				const res = await fetch(
-					`${this.rootUrl.replace(/\/+#/, "")}/${endpointPath}`,
-					{ headers },
-				);
-				if (!res.ok) {
-					if (res.status === 401) {
-						throw new PaprikaApiInvalidLoginDetailsError();
+			}
+			const res = await fetch(
+				`${this.rootUrl.replace(/\/+#/, "")}/${endpointPath}`,
+				requestOptions,
+			);
+			if (!res.ok) {
+				if (res.status === 401) {
+					throw new PaprikaApiInvalidLoginDetailsError();
+				}
+				throw new PaprikaApiError({body: await res.text().catch(() => {}) ?? undefined});
+			}
+			const resBody: { result: ResponseData } = await res.json();
+			return resBody.result;
+		}
+		const shouldCache = (!options.requestOptions?.method || options.requestOptions?.method === "GET") 
+			&& !options.gzippedDataPayload
+			&& (!("cacheTtl" in options) || options.cacheTtl !== 0)
+
+		if (shouldCache) {
+			return this.cache.memo(
+				fullCacheKey,
+				async () => {
+					logger.info(`Cache key: ${fullCacheKey}`)
+					if (fullAdditionalCacheSetKeys) {
+						logger.info(`Additional cache set keys: ${fullAdditionalCacheSetKeys.join(', ')}`)
 					}
-					throw new PaprikaApiError();
-				}
-				const resBody: { result: T } = await res.json();
-				return resBody.result;
-			},
-			{ 
-				cacheTtl: "cacheTtl" in options ? options.cacheTtl : 0,
-				additionalCacheSetKeys: fullAdditionalCacheSetKeys
-			},
-		);
+					return await sendUpstream()
+				},
+				{ 
+					cacheTtl: "cacheTtl" in options ? options.cacheTtl : 0,
+					additionalCacheSetKeys: fullAdditionalCacheSetKeys
+				},
+			);
+		}
+		return sendUpstream()
 	}
 
 	getHeaders() {

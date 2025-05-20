@@ -19,6 +19,7 @@
 		"@primevue/forms": "^4.2.5",
 		"@primevue/themes": "^4.2.5",
 		"@vueuse/core": "^12.4.0",
+		"formidable": "^3.5.4",
 		"keyv": "^5.2.3",
 		"keyv-file": "^5.1.1",
 		"nuxt": "^3.15.1",
@@ -35,6 +36,7 @@
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
 		"@primevue/nuxt-module": "^4.2.5",
+		"@types/formidable": "^3.4.5",
 		"@types/spark-md5": "^3.0.5",
 		"pino-pretty": "^13.0.0",
 		"primeicons": "^7.0.0"

@@ -60,6 +60,8 @@ Logo based on the spoon and frame doodle drawings from [Khushmeen Sidhu's Doodle
   - Group by supermarket aisle
 - Maybe provide an option to use without Paprika by allowing users to sign-up for local accounts and save their recipes directly in Spoon Fed, emulating the Paprika API to use the recipes.
 - Update to work offline
+- Add a sync button and show last sync date
+- Allow modifying recipe qty
 
 ## Architecture Choices
 ### Server-side Image Handling

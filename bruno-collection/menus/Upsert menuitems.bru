@@ -1,7 +1,7 @@
 meta {
-  name: Update menuitems
+  name: Upsert menuitems
   type: http
-  seq: 2
+  seq: 4
 }
 
 post {
@@ -17,7 +17,7 @@ body:multipart-form {
       {
         "order_flag": 0,
         "name": "Example Recipe",
-        "menu_uid": {{example-menu-uuid}},
+        "menu_uid": "{{example-menu-uuid}}",
         "deleted": false,
         "uid": "E904471E-BE37-47BF-AA4B-59CF69C66C5A",
         "recipe_uid": null,

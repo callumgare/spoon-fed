@@ -36,6 +36,28 @@ export type Category = {
 	parent_uid: null;
 };
 
+export type Menu = {
+	uid: string;
+	name: string;
+	notes: string;
+	order_flag: number;
+	days: number;
+};
+
+export type UpsertMenu = Menu & {deleted: boolean};
+
+export type MenuItem = {
+	uid: string,
+	name: string,
+	menu_uid: string,
+	recipe_uid: string | null,
+	type_uid: string | null
+	day: number,
+	order_flag: number,
+};
+
+export type UpsertMenuItem = MenuItem & {deleted: boolean};
+
 export type RecipeIndexItem = {
 	uid: string;
 	hash: string;

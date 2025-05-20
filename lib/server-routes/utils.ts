@@ -2,6 +2,12 @@ import type { EventHandlerRequest, H3Event } from "h3";
 import { Paprika } from "../paprika/client";
 import { PaprikaApiInvalidLoginDetailsError } from "../paprika/errors";
 import { ServerResponse } from 'node:http';
+import formidable from "formidable";
+import { decompressGzipStreamToText } from "../utils/compression";
+import { getFirst } from "~/lib/utils/conversion";
+import { createReadStream } from 'node:fs'
+import { Readable } from 'node:stream'
+import type { ReadableStream } from "node:stream/web";
 
 // We cache client objects rather than creating them on every request since
 // each object instantiates a Cache() object which might have it's own in-memory
@@ -35,7 +41,7 @@ export async function createPaprikaResponse(getRes: () => Promise<unknown>) {
 		}
 		
 		return {
-			result: await getRes(),
+			result: response,
 		};
 	} catch (error) {
 		if (error instanceof PaprikaApiInvalidLoginDetailsError) {
@@ -51,4 +57,32 @@ export async function createPaprikaResponse(getRes: () => Promise<unknown>) {
 		}
 		throw error;
 	}
+}
+
+export async function getGzippedPayload(event: H3Event<EventHandlerRequest>) {
+	const form = formidable({ multiples: true })
+
+	const { files } = await new Promise<{
+		fields: formidable.Fields
+		files: formidable.Files
+	}>((resolve, reject) => {
+		form.parse(event.node.req, (err, fields, files) => {
+			if (err) reject(err)
+			else resolve({ fields, files })
+		})
+	})
+	const file = getFirst(files.data)
+	if (!file) {
+		throw Error("Request has invalid payload")
+	}
+
+	const toWebReadable = (nodeStream: Readable): ReadableStream<unknown> => {
+		return Readable.toWeb(nodeStream)
+	}
+	const nodeStream = createReadStream(file.filepath)
+	const webStream = toWebReadable(nodeStream)
+
+	const payloadText = await decompressGzipStreamToText(webStream)
+
+	return JSON.parse(payloadText)
 }
