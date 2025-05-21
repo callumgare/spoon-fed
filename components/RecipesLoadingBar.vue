@@ -30,6 +30,7 @@ const props = defineProps<{
     flex: 0 1 20rem;
   }
 }
+/* We don't use nesting here since nesting the deep selector is currently broken https://github.com/vuejs/core/issues/13159 */
 :deep(.p-progressbar-determinate .p-progressbar-value) {
   justify-content: safe center;
   overflow: visible;

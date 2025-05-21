@@ -24,16 +24,14 @@ export const useShoppingList = createGlobalState(() => {
 		"shoppingListItemsCheckedState",
 		{},
 	);
-	const { recipes, status } = useRecipes();
+	const { status } = useRecipes();
 	const recipesSelectionQty = useRecipesSelectionQtyStore();
 
 	watch(recipesSelectionQty, () => {
 		// TODO: unselect shopping list item if it's currently selected and the selected recipe qty which an ingredient comes from, has increased
 	});
 
-	const selectedRecipes = computed(() =>
-		recipes.value.filter((recipe) => recipesSelectionQty.value[recipe.uid]),
-	);
+	const {selectedRecipes} = useSelectedRecipes()
 
 	const shoppingListItems = computed(() => {
 		const shoppingListItemsMap: Record<string, ShoppingListItem> = {};

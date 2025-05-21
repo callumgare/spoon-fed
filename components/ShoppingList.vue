@@ -3,11 +3,14 @@ const { shoppingListItems } = useShoppingList();
 </script>
 
 <template>
-  <TransitionGroup v-if="shoppingListItems.length" tag="ul" name="fade" class="ShoppingList">
-    <li v-for="shoppingListItem in shoppingListItems.toSorted((a, b) => b.checkedSortKey.value - a.checkedSortKey.value)" :key="shoppingListItem.key">
-      <ShoppingListItem :item="shoppingListItem" />
-    </li>
-  </TransitionGroup>
+  <div v-if="shoppingListItems.length">
+    <SelectedRecipesInfoBar />
+    <TransitionGroup tag="ul" name="fade" class="ShoppingList">
+      <li v-for="shoppingListItem in shoppingListItems.toSorted((a, b) => b.checkedSortKey.value - a.checkedSortKey.value)" :key="shoppingListItem.key">
+        <ShoppingListItem :item="shoppingListItem" />
+      </li>
+    </TransitionGroup>
+  </div>
   <div v-else>
     No shopping list items. Please select some recipes to add ingredients to your shopping list.
   </div>
