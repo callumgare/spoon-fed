@@ -100,10 +100,12 @@ const hasContentSection = slots.additionalContent || selectionMethod === "icon"
 <style scoped>
 .RecipeCard {
   &, button {
+    /* remove styles set by browser */
     background: none;
     border: none;
     padding: 0;
     display: block;
+    color: inherit;
   }
 
   --selected-color: var(--p-yellow-500);
@@ -181,6 +183,10 @@ const hasContentSection = slots.additionalContent || selectionMethod === "icon"
         justify-content: space-between;
         align-items: center;
         color: var(--p-text-color);
+
+        button {
+          padding: 0.5rem;
+        }
 
         .pi {
           font-size: 1.4rem;
