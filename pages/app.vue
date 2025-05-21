@@ -11,7 +11,7 @@ onMounted(async () => {
 	}
 });
 
-const { results } = useRecipeResults();
+const { results, groupBy } = useRecipeResults();
 
 const currentTab = useLocalStorage<"recipes" | "shoppingList">("currentTab", "recipes")
 
@@ -20,6 +20,8 @@ function handleLogout() {
 	settings.value.email = "";
 	navigateTo("/");
 }
+
+const {selectedRecipes} = useSelectedRecipes({onlyFilteredOut: true})
 </script>
 
 <template>
@@ -43,8 +45,12 @@ function handleLogout() {
 			<TabPanels>
 				<TabPanel value="recipes">
 					<RecipeResultsControls />
+					<SelectedRecipesInfoBar
+						v-if="selectedRecipes.length"
+						:only-show-filtered-out="true"
+					/>
 					<div v-for="recipeGroup in results" :class="{noGroup: !recipeGroup.groupedValue}">
-						<h3 v-if="results.length !== 1 || recipeGroup.groupedValue">
+						<h3 v-if="groupBy">
 							{{ recipeGroup.groupedValue || "No Group" }}
 						</h3>
 						<RecipesSelector :recipes="recipeGroup.recipes" />

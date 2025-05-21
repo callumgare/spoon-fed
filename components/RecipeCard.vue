@@ -110,7 +110,6 @@ const hasContentSection = slots.additionalContent || selectionMethod === "icon"
   
   &.selected .p-card {
     outline: var(--selected-color) 0.2rem solid;
-    color: black;
   }
   
   
@@ -120,7 +119,10 @@ const hasContentSection = slots.additionalContent || selectionMethod === "icon"
     }
     &:not(.selected):hover .p-card {
       outline: var(--selected-color) 0.1rem solid;
-      color: black;
+    }
+  
+    &.selected .p-card {
+      color: var(--p-surface-800);
     }
   }
 
@@ -178,6 +180,7 @@ const hasContentSection = slots.additionalContent || selectionMethod === "icon"
         align-items: center;
         justify-content: space-between;
         align-items: center;
+        color: var(--p-text-color);
 
         .pi {
           font-size: 1.4rem;
@@ -205,5 +208,6 @@ const hasContentSection = slots.additionalContent || selectionMethod === "icon"
   align-items: center;
   justify-content: space-between;
   align-items: center;
+  padding: 1rem;
 }
 </style>

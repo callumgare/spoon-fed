@@ -80,13 +80,13 @@ body {
 :root {
 	@media (prefers-color-scheme: light) {
 		--p-content-border-color: var(--p-surface-300);
-		color: var(--p-surface-800);
+		--p-text-color: var(--p-surface-800);
 	}
 	@media (prefers-color-scheme: dark) {
 		--p-text-muted-color: var(--p-surface-300);
-		color: var(--p-surface-100);
-		
+		--p-text-color: var(--p-surface-100);
 	}
+	color: var(--p-text-color);
 }
 
 /* Taken from https://css-tricks.com/inclusively-hidden/ */

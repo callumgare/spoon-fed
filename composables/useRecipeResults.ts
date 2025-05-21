@@ -33,7 +33,7 @@ export const useRecipeResults = createGlobalState(() => {
 	});
 	const { recipesWithLoading } = useRecipes();
 	const { includeSubcategories, getCategoryById } = useCategories();
-	const results = computed(() => {
+	const results = computed<RecipeGroup[]>(() => {
 		const filteredRecipes = recipesWithLoading.value.filter((recipe) => {
 			if (!recipe) {
 				return true; // Don't filter out results that are still loading

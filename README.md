@@ -50,7 +50,6 @@ Logo based on the spoon and frame doodle drawings from [Khushmeen Sidhu's Doodle
 
 ## Future plans (no promises though)
 - In the "recipes selected" collapser in shopping list view, add an eye open/closed icon for temporarily toggling the inclusion of ingredients for the given recipe.
-- Add a similar collapsible section to the recipe selection page that shows any recipes that are hidden due to the current filter.
 - Add sorting option to recipe view.
 - Move to parse-ingredient library to remove headers
 - Use key for indicating which ingredients are from which recipes
