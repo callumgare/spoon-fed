@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useLocalStorage } from "@vueuse/core";
 import RecipeResultsControls from "~/components/RecipeResultsControls.vue";
 
 const { recipes, status, total } = useRecipes();
@@ -11,6 +12,8 @@ onMounted(async () => {
 });
 
 const { results } = useRecipeResults();
+
+const currentTab = useLocalStorage<"recipes" | "shoppingList">("currentTab", "recipes")
 
 function handleLogout() {
 	settings.value.auth = "";
@@ -32,7 +35,7 @@ function handleLogout() {
 				<Button label="Logout" icon="pi pi-sign-out" severity="secondary" @click="handleLogout"/>
 			</div>
 		</nav>
-		<Tabs value="recipes" class="tabs">
+		<Tabs v-model:value="currentTab" class="tabs">
 			<TabList>
 				<Tab value="recipes">Recipes</Tab>
 				<Tab value="shoppingList">Shopping List</Tab>
