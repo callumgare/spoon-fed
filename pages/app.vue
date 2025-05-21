@@ -55,6 +55,9 @@ const {selectedRecipes} = useSelectedRecipes({onlyFilteredOut: true})
 						</h3>
 						<RecipesSelector :recipes="recipeGroup.recipes" />
 					</div>
+					<div v-if="!results.length" class="status">
+						No recipes. Try adding some in Paprika.
+					</div>
 				</TabPanel>
 				<TabPanel value="shoppingList">
 					<ShoppingList />
@@ -130,6 +133,11 @@ const {selectedRecipes} = useSelectedRecipes({onlyFilteredOut: true})
 			h3 {
 				color: var(--p-text-muted-color);
 			}
+		}
+
+		.status {
+			margin: 4rem;
+			font-size: 1.5rem;
 		}
 	}
 	@media (min-width: 499px) {

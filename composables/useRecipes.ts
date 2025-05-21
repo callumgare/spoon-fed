@@ -36,12 +36,15 @@ export const useRecipes = createGlobalState(() => {
 	const { refreshCategories, getCategoryById } = useCategories();
 
 	const recipes = ref<Recipe[]>([]);
-	const recipesWithLoading = computed((): (Recipe | null)[] => [
-		...recipes.value,
-		...new Array(total.value ? total.value - recipes.value.length : 3).fill(
-			null,
-		),
-	]);
+	const recipesWithLoading = computed((): (Recipe | null)[] => {
+		const numberOfLoadingRecipesToInclude = total.value || recipesIndex.status.value !== 'pending' ? (total.value || 0) - recipes.value.length : 3
+		return [
+			...recipes.value,
+			...new Array(numberOfLoadingRecipesToInclude).fill(
+				null,
+			),
+		]
+	});
 
 	function getRecipe(recipeId: string) {
 		return recipes.value.find(recipe => recipe.uid === recipeId)
@@ -66,6 +69,9 @@ export const useRecipes = createGlobalState(() => {
 					if (!paprika.value) {
 						break;
 					}
+					// if (recipes.value.length > 3) {
+					// 	break;
+					// }
 					const recipe = await paprika.value.recipe(recipeIndex.uid, {
 						hash: recipeIndex.hash,
 						cacheTtl: undefined, // We cache forever since a hash change will break the cache
