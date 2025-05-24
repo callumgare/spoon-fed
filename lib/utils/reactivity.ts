@@ -1,6 +1,6 @@
 type WatchCallback<T> = <K extends keyof T>(
   key: K,
-  oldValue: T[K],
+  oldValue: T[K] | undefined,
   newValue: T[K]
 ) => void
 
@@ -21,7 +21,7 @@ export function wrapWithPropertyChangeWatcher<T extends object>(
         // Optionally handle new keys being added
         const key = prop as keyof T
         target[key] = value
-        callback(key, undefined as any, value)
+        callback(key, undefined, value)
       }
       return true
     }

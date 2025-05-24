@@ -15,7 +15,7 @@ export const useRecipesSelectionQtyStore = createGlobalState(() => {
     }
   }, {immediate: true})
 
-  function updatePaprikaMenuItem(recipeId: string, oldValue: number, newValue: number) {
+  function updatePaprikaMenuItem(recipeId: string, oldValue: number | undefined, newValue: number) {
     const recipe = getRecipe(recipeId)
     if (!recipe) {
       throw Error(`Attempted to update the qty of recipe "${recipeId}" but such a recipe does not appear to exist`)
